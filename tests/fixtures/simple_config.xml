@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+
+    <moduleName position="Left">Example Mod</moduleName>
+    <moduleImage path="banner.png" showImage="true" height="100"/>
+
+    <requiredInstallFiles>
+        <file source="readme.txt" destination="Data"/>
+        <folder source="core_files" destination="Data/meshes"/>
+    </requiredInstallFiles>
+
+    <installSteps order="Explicit">
+        <installStep name="Choose Textures">
+            <optionalFileGroups order="Explicit">
+                <group name="Texture Quality" type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="High Resolution">
+                            <description>4K textures for maximum quality</description>
+                            <image path="images/hd.png"/>
+                            <typeDescriptor><type name="Recommended"/></typeDescriptor>
+                            <conditionFlags>
+                                <flag name="texture_quality">high</flag>
+                            </conditionFlags>
+                            <files>
+                                <folder source="textures_4k" destination="Data/textures"/>
+                            </files>
+                        </plugin>
+                        <plugin name="Standard Resolution">
+                            <description>2K textures for balanced performance</description>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <conditionFlags>
+                                <flag name="texture_quality">standard</flag>
+                            </conditionFlags>
+                            <files>
+                                <folder source="textures_2k" destination="Data/textures"/>
+                            </files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+
+        <installStep name="Optional Patches">
+            <visible>
+                <flagDependency flag="texture_quality" value="high"/>
+            </visible>
+            <optionalFileGroups>
+                <group name="Performance Patches" type="SelectAny">
+                    <plugins>
+                        <plugin name="LOD Optimization">
+                            <description>Reduces LOD quality for better FPS</description>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files>
+                                <file source="patches/lod_opt.esp" destination="Data"/>
+                            </files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+
+    <conditionalFileInstalls>
+        <patterns>
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="texture_quality" value="high"/>
+                </dependencies>
+                <files>
+                    <file source="patches/hd_normals.esp" destination="Data"/>
+                </files>
+            </pattern>
+        </patterns>
+    </conditionalFileInstalls>
+</config>

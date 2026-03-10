@@ -1,0 +1,17 @@
+[package]
+name = "fomod-oxide"
+version = "0.1.0"
+edition = "2024"
+description = "FOMOD mod installer XML parser and evaluator"
+license = "MIT OR Apache-2.0"
+repository = "https://codeberg.org/caniko/rs-fomod-oxide"
+keywords = ["fomod", "modding", "nexus-mods", "game-mods"]
+categories = ["parser-implementations", "game-development"]
+
+[dependencies]
+quick-xml = { version = "0.37", features = ["serialize"] }
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+
+[dev-dependencies]
+pretty_assertions = "1"

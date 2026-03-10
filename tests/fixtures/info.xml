@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fomod>
+    <Name>Example Mod</Name>
+    <Author>TestAuthor</Author>
+    <Version>1.2.0</Version>
+    <Description>A test FOMOD package</Description>
+    <Website>https://example.com</Website>
+</fomod>
