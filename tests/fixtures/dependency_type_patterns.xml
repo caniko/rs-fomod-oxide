@@ -1,0 +1,136 @@
+<config>
+    <moduleName>DependencyType Patterns Test</moduleName>
+
+    <installSteps order="Explicit">
+        <installStep name="Choose Platform">
+            <optionalFileGroups>
+                <group name="Platform" type="SelectExactlyOne">
+                    <plugins>
+                        <plugin name="Windows">
+                            <conditionFlags>
+                                <flag name="platform">windows</flag>
+                                <flag name="os_family">desktop</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="win_base.dll" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Linux">
+                            <conditionFlags>
+                                <flag name="platform">linux</flag>
+                                <flag name="os_family">desktop</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="linux_base.so" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="SteamDeck">
+                            <conditionFlags>
+                                <flag name="platform">steamdeck</flag>
+                                <flag name="os_family">handheld</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="deck_base.so" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+
+        <installStep name="Compatibility">
+            <optionalFileGroups>
+                <group name="Results" type="SelectAny">
+                    <plugins>
+                        <!-- First match wins: windows matches first pattern,
+                             linux matches second, steamdeck matches third,
+                             anything else gets default NotUsable -->
+                        <plugin name="Windows Patch">
+                            <typeDescriptor>
+                                <dependencyType>
+                                    <defaultType name="NotUsable"/>
+                                    <patterns>
+                                        <pattern>
+                                            <dependencies>
+                                                <flagDependency flag="platform" value="windows"/>
+                                            </dependencies>
+                                            <type name="Required"/>
+                                        </pattern>
+                                        <pattern>
+                                            <dependencies>
+                                                <flagDependency flag="os_family" value="desktop"/>
+                                            </dependencies>
+                                            <type name="Recommended"/>
+                                        </pattern>
+                                    </patterns>
+                                </dependencyType>
+                            </typeDescriptor>
+                            <files><file source="win_patch.dll" destination="Data"/></files>
+                        </plugin>
+
+                        <plugin name="Desktop Patch">
+                            <typeDescriptor>
+                                <dependencyType>
+                                    <defaultType name="NotUsable"/>
+                                    <patterns>
+                                        <pattern>
+                                            <dependencies>
+                                                <flagDependency flag="os_family" value="desktop"/>
+                                            </dependencies>
+                                            <type name="Recommended"/>
+                                        </pattern>
+                                        <pattern>
+                                            <dependencies>
+                                                <flagDependency flag="os_family" value="handheld"/>
+                                            </dependencies>
+                                            <type name="Optional"/>
+                                        </pattern>
+                                    </patterns>
+                                </dependencyType>
+                            </typeDescriptor>
+                            <files><file source="desktop_patch.dll" destination="Data"/></files>
+                        </plugin>
+
+                        <plugin name="CouldBeUsable Plugin">
+                            <typeDescriptor>
+                                <dependencyType>
+                                    <defaultType name="CouldBeUsable"/>
+                                    <patterns>
+                                        <pattern>
+                                            <dependencies>
+                                                <flagDependency flag="platform" value="steamdeck"/>
+                                            </dependencies>
+                                            <type name="Required"/>
+                                        </pattern>
+                                    </patterns>
+                                </dependencyType>
+                            </typeDescriptor>
+                            <files><file source="maybe.dll" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+
+    <conditionalFileInstalls>
+        <patterns>
+            <!-- Both patterns can match simultaneously if both flags are set -->
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="os_family" value="desktop"/>
+                </dependencies>
+                <files><file source="desktop_extras.dll" destination="Data"/></files>
+            </pattern>
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="platform" value="windows"/>
+                </dependencies>
+                <files><file source="win_extras.dll" destination="Data"/></files>
+            </pattern>
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="platform" value="steamdeck"/>
+                </dependencies>
+                <files><file source="deck_extras.dll" destination="Data"/></files>
+            </pattern>
+        </patterns>
+    </conditionalFileInstalls>
+</config>

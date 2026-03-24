@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tests complex step visibility with chained flag dependencies -->
+<config>
+    <moduleName>Multi Step Visibility</moduleName>
+
+    <installSteps order="Explicit">
+        <!-- Step 0: Always visible -->
+        <installStep name="Choose Mode">
+            <optionalFileGroups>
+                <group name="Mode" type="SelectExactlyOne">
+                    <plugins>
+                        <plugin name="Basic">
+                            <conditionFlags><flag name="mode">basic</flag></conditionFlags>
+                            <typeDescriptor><type name="Recommended"/></typeDescriptor>
+                        </plugin>
+                        <plugin name="Advanced">
+                            <conditionFlags><flag name="mode">advanced</flag></conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                        <plugin name="Expert">
+                            <conditionFlags>
+                                <flag name="mode">expert</flag>
+                                <flag name="show_expert">yes</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+
+        <!-- Step 1: Visible only in advanced mode -->
+        <installStep name="Advanced Options">
+            <visible>
+                <flagDependency flag="mode" value="advanced"/>
+            </visible>
+            <optionalFileGroups>
+                <group name="Tweaks" type="SelectAny">
+                    <plugins>
+                        <plugin name="Tweak A">
+                            <conditionFlags><flag name="tweak_a">on</flag></conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="tweak_a.esp" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+
+        <!-- Step 2: Visible only in expert mode -->
+        <installStep name="Expert Options">
+            <visible>
+                <dependencies operator="And">
+                    <flagDependency flag="mode" value="expert"/>
+                    <flagDependency flag="show_expert" value="yes"/>
+                </dependencies>
+            </visible>
+            <optionalFileGroups>
+                <group name="Expert Tweaks" type="SelectAny">
+                    <plugins>
+                        <plugin name="Debug Mode">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="debug.esp" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+
+        <!-- Step 3: Visible when either advanced OR expert -->
+        <installStep name="Summary">
+            <visible>
+                <dependencies operator="Or">
+                    <flagDependency flag="mode" value="advanced"/>
+                    <flagDependency flag="mode" value="expert"/>
+                </dependencies>
+            </visible>
+            <optionalFileGroups>
+                <group name="Confirm" type="SelectAll">
+                    <plugins>
+                        <plugin name="Confirm">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+</config>

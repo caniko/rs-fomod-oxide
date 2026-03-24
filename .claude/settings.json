@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /data/nvme0/can/Projects/rs-modde log --oneline -10)",
+      "Bash(git -C /data/nvme0/can/Projects/rs-fomod-oxide log --oneline -5)",
+      "Bash(/nix/store/038bps96h9h5plzsjdq6a2nhwz57rv2v-rust-default-1.94.0/bin/cargo test:*)",
+      "Bash(/nix/store/0wl4x611w8g3crr9wxykbhyyvp7jwgsj-rust-default-1.94.0/bin/cargo test:*)"
+    ],
+    "additionalDirectories": [
+      "/data/nvme0/can/Projects/rs-modde/crates/modde-ui/src/views",
+      "/data/nvme0/can/Projects/rs-modde/crates/modde-ui/src"
+    ]
+  }
+}

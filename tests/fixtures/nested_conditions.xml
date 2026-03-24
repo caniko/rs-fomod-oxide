@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tests deeply nested AND/OR composite dependencies -->
+<config>
+    <moduleName>Nested Conditions</moduleName>
+
+    <!-- Module requires: (flagA=yes AND (flagB=yes OR flagC=yes)) -->
+    <moduleDependencies operator="And">
+        <flagDependency flag="flagA" value="yes"/>
+        <dependencies operator="Or">
+            <flagDependency flag="flagB" value="yes"/>
+            <flagDependency flag="flagC" value="yes"/>
+        </dependencies>
+    </moduleDependencies>
+
+    <installSteps order="Explicit">
+        <installStep name="Step 1">
+            <optionalFileGroups>
+                <group name="Options" type="SelectAny">
+                    <plugins>
+                        <plugin name="Plugin A">
+                            <conditionFlags>
+                                <flag name="flagA">yes</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                        <plugin name="Plugin B">
+                            <conditionFlags>
+                                <flag name="flagB">yes</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                        <plugin name="Plugin C">
+                            <conditionFlags>
+                                <flag name="flagC">yes</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+
+    <conditionalFileInstalls>
+        <patterns>
+            <!-- Deeply nested: (A AND (B OR (C AND D))) -->
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="flagA" value="yes"/>
+                    <dependencies operator="Or">
+                        <flagDependency flag="flagB" value="yes"/>
+                        <dependencies operator="And">
+                            <flagDependency flag="flagC" value="yes"/>
+                            <flagDependency flag="flagD" value="yes"/>
+                        </dependencies>
+                    </dependencies>
+                </dependencies>
+                <files>
+                    <file source="nested_result.esp" destination="Data"/>
+                </files>
+            </pattern>
+        </patterns>
+    </conditionalFileInstalls>
+</config>

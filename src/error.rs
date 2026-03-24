@@ -1,5 +1,7 @@
 use thiserror::Error;
 
+use crate::declarative::DeclarativeError;
+
 #[derive(Debug, Error)]
 pub enum FomodError {
     #[error("XML parsing error: {0}")]
@@ -13,6 +15,9 @@ pub enum FomodError {
 
     #[error("unsupported schema version: {0}")]
     UnsupportedVersion(String),
+
+    #[error(transparent)]
+    Declarative(#[from] DeclarativeError),
 }
 
 pub type Result<T> = std::result::Result<T, FomodError>;

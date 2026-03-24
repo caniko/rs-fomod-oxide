@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tests file priority ordering and destination handling -->
+<config>
+    <moduleName>Priority Test</moduleName>
+
+    <requiredInstallFiles>
+        <file source="base.esp" destination="Data" priority="0"/>
+        <file source="base_override.esp" destination="Data" priority="10"/>
+    </requiredInstallFiles>
+
+    <installSteps order="Explicit">
+        <installStep name="Files">
+            <optionalFileGroups>
+                <group name="Options" type="SelectAny">
+                    <plugins>
+                        <plugin name="Low Priority">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files>
+                                <file source="low.esp" destination="Data" priority="-5"/>
+                                <folder source="low_folder" destination="Data/meshes" priority="-5"/>
+                            </files>
+                        </plugin>
+                        <plugin name="High Priority">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files>
+                                <file source="high.esp" destination="Data" priority="100"/>
+                            </files>
+                        </plugin>
+                        <plugin name="No Destination">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files>
+                                <file source="keep_path.esp"/>
+                                <folder source="keep_folder"/>
+                            </files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+</config>

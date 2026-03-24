@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tests all five GroupType variants with various plugin types -->
+<config>
+    <moduleName>All Group Types</moduleName>
+
+    <installSteps order="Explicit">
+        <installStep name="Step 1">
+            <optionalFileGroups order="Explicit">
+                <group name="ExactlyOne" type="SelectExactlyOne">
+                    <plugins>
+                        <plugin name="Required Plugin">
+                            <typeDescriptor><type name="Required"/></typeDescriptor>
+                            <files><file source="exactly_one_required.esp" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Optional Plugin">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="exactly_one_optional.esp" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="AtMostOne" type="SelectAtMostOne">
+                    <plugins>
+                        <plugin name="Recommended Plugin">
+                            <typeDescriptor><type name="Recommended"/></typeDescriptor>
+                            <files><file source="at_most_one_rec.esp" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Alt Plugin">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="at_most_one_alt.esp" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="AtLeastOne" type="SelectAtLeastOne">
+                    <plugins>
+                        <plugin name="Core">
+                            <typeDescriptor><type name="Required"/></typeDescriptor>
+                            <files><file source="at_least_core.esp" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Extra A">
+                            <typeDescriptor><type name="Recommended"/></typeDescriptor>
+                            <files><file source="at_least_extra_a.esp" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Extra B">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="at_least_extra_b.esp" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="All" type="SelectAll">
+                    <plugins>
+                        <plugin name="Mandatory A">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="all_a.esp" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Mandatory B">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="all_b.esp" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="Any" type="SelectAny">
+                    <plugins>
+                        <plugin name="Whatever A">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="any_a.esp" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Whatever B">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="any_b.esp" destination="Data"/></files>
+                        </plugin>
+                        <plugin name="Whatever C">
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                            <files><file source="any_c.esp" destination="Data"/></files>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+</config>

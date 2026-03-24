@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Inspired by Faster HDT-SMP (https://github.com/DaymareOn/hdtSMP64) -->
+<!-- Trimmed to cover: multi-group steps, step visibility via <dependencies> wrapper,
+     conditional file installs with multi-flag And conditions, and SelectAll groups. -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+
+    <moduleName>Faster HDT-SMP</moduleName>
+    <moduleImage path="banner.png"/>
+
+    <requiredInstallFiles>
+        <file source="Licence.txt" destination="Licence.txt"/>
+        <file source="Readme.txt" destination="Readme.txt"/>
+    </requiredInstallFiles>
+
+    <installSteps order="Explicit">
+        <!-- Step 0: Introduction (SelectAll = informational) -->
+        <installStep name="Introduction">
+            <optionalFileGroups order="Explicit">
+                <group name="Introduction" type="SelectAll">
+                    <plugins order="Explicit">
+                        <plugin name="Introduction">
+                            <description>An SKSE plugin for advanced physics.</description>
+                            <image path="banner.png"/>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+
+        <!-- Step 1: Platform + options (multiple SelectExactlyOne groups) -->
+        <installStep name="Options">
+            <optionalFileGroups order="Explicit">
+                <group name="Platform" type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="SE">
+                            <description>Skyrim Special Edition 1.5.97</description>
+                            <conditionFlags>
+                                <flag name="SSE">On</flag>
+                                <flag name="AE">Off</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                        <plugin name="AE">
+                            <description>Skyrim Anniversary Edition</description>
+                            <conditionFlags>
+                                <flag name="AE">On</flag>
+                                <flag name="SSE">Off</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                        <plugin name="VR">
+                            <description>Skyrim VR</description>
+                            <conditionFlags>
+                                <flag name="SSE">Off</flag>
+                                <flag name="AE">Off</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+                <group name="CUDA" type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="CUDA">
+                            <description>Enable CUDA GPU acceleration</description>
+                            <conditionFlags>
+                                <flag name="CUDA">On</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                        <plugin name="No CUDA">
+                            <description>CPU only (recommended)</description>
+                            <conditionFlags>
+                                <flag name="CUDA">Off</flag>
+                            </conditionFlags>
+                            <typeDescriptor><type name="Recommended"/></typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+
+        <!-- Step 2: Only visible for SE or AE (uses <dependencies> wrapper) -->
+        <installStep name="Thanks">
+            <visible>
+                <dependencies operator="Or">
+                    <flagDependency flag="SSE" value="On"/>
+                    <flagDependency flag="AE" value="On"/>
+                </dependencies>
+            </visible>
+            <optionalFileGroups order="Explicit">
+                <group name="Credits" type="SelectAll">
+                    <plugins order="Explicit">
+                        <plugin name="Thanks">
+                            <description>Thank you for using this mod!</description>
+                            <typeDescriptor><type name="Optional"/></typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+
+    <conditionalFileInstalls>
+        <patterns>
+            <!-- SE + CUDA -->
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="SSE" value="On"/>
+                    <flagDependency flag="CUDA" value="On"/>
+                </dependencies>
+                <files>
+                    <folder source="SE_CUDA\SKSE" destination="SKSE" priority="0"/>
+                </files>
+            </pattern>
+            <!-- SE + No CUDA -->
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="SSE" value="On"/>
+                    <flagDependency flag="CUDA" value="Off"/>
+                </dependencies>
+                <files>
+                    <folder source="SE_NOCUDA\SKSE" destination="SKSE" priority="0"/>
+                </files>
+            </pattern>
+            <!-- AE + CUDA -->
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="AE" value="On"/>
+                    <flagDependency flag="CUDA" value="On"/>
+                </dependencies>
+                <files>
+                    <folder source="AE_CUDA\SKSE" destination="SKSE" priority="0"/>
+                </files>
+            </pattern>
+            <!-- AE + No CUDA -->
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="AE" value="On"/>
+                    <flagDependency flag="CUDA" value="Off"/>
+                </dependencies>
+                <files>
+                    <folder source="AE_NOCUDA\SKSE" destination="SKSE" priority="0"/>
+                </files>
+            </pattern>
+        </patterns>
+    </conditionalFileInstalls>
+</config>

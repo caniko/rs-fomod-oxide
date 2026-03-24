@@ -1,17 +1,38 @@
 [package]
 name = "fomod-oxide"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+rust-version = "1.70"
 description = "FOMOD mod installer XML parser and evaluator"
 license = "MIT OR Apache-2.0"
+readme = "README.md"
 repository = "https://codeberg.org/caniko/rs-fomod-oxide"
 keywords = ["fomod", "modding", "nexus-mods", "game-mods"]
 categories = ["parser-implementations", "game-development"]
+exclude = [".envrc", ".gitignore", "flake.nix", "flake.lock", "/result"]
+
+[features]
+default = []
+json = ["dep:serde_json"]
+ron = ["dep:ron"]
+nix = ["dep:ronix"]
+cli = ["nix", "json", "ron", "dep:clap"]
 
 [dependencies]
+base64 = "0.22"
+clap = { version = "4", features = ["derive"], optional = true }
 quick-xml = { version = "0.37", features = ["serialize"] }
+ron = { version = "0.9", optional = true }
+ronix = { version = "0.1", optional = true }
 serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", optional = true }
+sha2 = "0.10"
 thiserror = "2"
 
 [dev-dependencies]
 pretty_assertions = "1"
+ronix = "0.1"
+
+[[bin]]
+name = "fomod-oxide"
+required-features = ["cli"]
