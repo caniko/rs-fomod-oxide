@@ -86,6 +86,10 @@ fomod-oxide ModuleConfig.xml --rev "2.1.0" -o config.nix
 | `nix` | Nix expression output via `ronix` |
 | `cli` | Builds the `fomod-oxide` binary (enables `json`, `ron`, `nix`, `clap`) |
 
+## CI
+
+Woodpecker CI on Codeberg runs `nix flake check` (build, tests, clippy, fmt) on every push and pull request.
+
 ## License
 
 Licensed under either of
