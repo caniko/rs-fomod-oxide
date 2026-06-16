@@ -4,6 +4,11 @@
     crane.url = "github:ipetkov/crane";
     flake-utils.url = "github:numtide/flake-utils";
     ronix.url = "git+https://codeberg.org/caniko/ronix";
+    plinth = {
+      url = "git+https://codeberg.org/caniko/plinth.git?ref=refs/heads/trunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -17,6 +22,7 @@
       crane,
       flake-utils,
       ronix,
+      plinth,
       rust-overlay,
       ...
     }:
@@ -53,6 +59,11 @@
             inherit cargoArtifacts;
           }
         );
+        website = plinth.lib.${system}.mkProjectSite {
+          pname = "fomod-oxide-website";
+          domain = "fomod-oxide.tartanoglu.com";
+          configPath = ./website/plinth-project.toml;
+        };
       in
       {
         checks = {
@@ -71,6 +82,12 @@
 
         packages = {
           default = fomod-oxide;
+          website = website;
+          site = website;
+        };
+
+        apps.deploy-pages = plinth.lib.${system}.mkDeployPagesApp {
+          domain = "fomod-oxide.tartanoglu.com";
         };
 
         devShells.default = craneLib.devShell {
