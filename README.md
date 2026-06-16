@@ -1,5 +1,9 @@
 # fomod-oxide
 
+<!-- simit:badges:start -->
+[![CI](https://img.shields.io/badge/CI-drift-2088ff)](.forgejo/workflows/ci.yaml) [![Nix](https://img.shields.io/badge/Nix-managed-5277c3)](flake.nix) [![crates.io](https://img.shields.io/badge/crates.io-ready-f46623)](https://crates.io/crates/fomod-oxide)
+<!-- simit:badges:end -->
+
 A Rust library for parsing and evaluating [FOMOD](https://fomod-docs.readthedocs.io/) mod installer configurations.
 
 FOMOD is an XML-based format used by mod managers (Mod Organizer 2, Vortex, etc.) to define guided installation wizards for game mods.
