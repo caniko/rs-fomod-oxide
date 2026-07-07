@@ -22,7 +22,7 @@ cli = ["nix", "json", "ron", "dep:clap"]
 [dependencies]
 base64 = "0.22"
 clap = { version = "4", features = ["derive"], optional = true }
-quick-xml = { version = "0.37", features = ["serialize"] }
+quick-xml = { version = "0.41", features = ["serialize"] }
 ron = { version = "0.12", optional = true }
 ronix = { version = "0.1", optional = true }
 serde = { version = "1", features = ["derive"] }
