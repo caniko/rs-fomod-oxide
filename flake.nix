@@ -1,5 +1,6 @@
 {
   inputs = {
+    rs-harbor.url = "git+https://codeberg.org/caniko/rs-harbor.git?ref=trunk&rev=9bfa8bdb0ecb22d7bc11448665f7fbaebae7a759";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     crane.url = "github:ipetkov/crane";
     flake-utils.url = "github:numtide/flake-utils";
@@ -18,6 +19,7 @@
   outputs =
     {
       self,
+      rs-harbor,
       nixpkgs,
       crane,
       flake-utils,
@@ -39,6 +41,13 @@
 
         rustToolchain = pkgs.rust-bin.stable.latest.default;
         craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
+        buildCache = rs-harbor.lib.mkBuildCachePolicy {
+          inherit pkgs;
+          sccachePackage = rs-harbor.packages.${system}.sccache;
+          cacheRoot = null;
+          namespaceScope = "canix-rust";
+          namespaceGeneration = 5;
+        };
 
         src = pkgs.lib.cleanSourceWith {
           src = ./.;
@@ -53,12 +62,12 @@
 
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
-        fomod-oxide = craneLib.buildPackage (
+        fomod-oxide = buildCache.withRustCache { package = craneLib.buildPackage (
           commonArgs
           // {
             inherit cargoArtifacts;
           }
-        );
+        ); };
         website = plinth.lib.${system}.mkProjectSite {
           pname = "fomod-oxide-website";
           domain = "fomod-oxide.tartanoglu.com";
