@@ -1,6 +1,6 @@
 [site]
 title = "fomod-oxide"
-description = "A Rust library for parsing and evaluating [FOMOD](https://fomod-docs.readthedocs.io/) mod installer configurations."
+description = "A Rust library for parsing FOMOD mod-installer XML, evaluating conditions, and resolving install plans."
 base_url = "/"
 footer_note = "Generated from repository metadata by the plinth-project FOSS sweep."
 
@@ -19,13 +19,13 @@ href = "ssh://git@codeberg.org/caniko/rs-fomod-oxide.git"
 [[pages]]
 slug = "index"
 title = "fomod-oxide"
-description = "A Rust library for parsing and evaluating [FOMOD](https://fomod-docs.readthedocs.io/) mod installer configurations."
+description = "A Rust library for parsing FOMOD mod-installer XML, evaluating conditions, and resolving install plans."
 
 [[pages.sections]]
 type = "hero"
 title = "fomod-oxide"
-tagline = "A Rust library for parsing and evaluating [FOMOD](https://fomod-docs.readthedocs.io/) mod installer configurations."
-subtitle = "A Rust library for parsing and evaluating [FOMOD](https://fomod-docs.readthedocs.io/) mod installer configurations."
+tagline = "Guided FOMOD mod installation in Rust"
+subtitle = "Parse installer XML, evaluate conditions, and resolve file operations into a deterministic plan."
 
 [[pages.sections.ctas]]
 label = "View source"
@@ -43,4 +43,3 @@ description = "Project technology detected from repository manifests."
 [[pages.sections.features]]
 title = "Nix"
 description = "Project technology detected from repository manifests."
-
