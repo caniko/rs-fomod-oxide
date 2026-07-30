@@ -1,6 +1,6 @@
 {
   inputs = {
-    rs-harbor.url = "git+https://codeberg.org/caniko/rs-harbor.git?ref=trunk&rev=9bfa8bdb0ecb22d7bc11448665f7fbaebae7a759";
+    rs-harbor.url = "git+https://codeberg.org/caniko/rs-harbor.git?ref=trunk&rev=c26b735eede8078f795651c4a9cbf0be8733b221";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     crane.url = "github:ipetkov/crane";
     flake-utils.url = "github:numtide/flake-utils";
@@ -39,7 +39,7 @@
           overlays = [ (import rust-overlay) ];
         };
 
-        rustToolchain = pkgs.rust-bin.stable.latest.default;
+        rustToolchain = rs-harbor.lib.mkToolchain { toolchainProfile = "stable"; };
         craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
         buildCache = rs-harbor.lib.mkBuildCachePolicy {
           inherit pkgs;
