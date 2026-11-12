@@ -1,8 +1,7 @@
 [site]
 title = "fomod-oxide"
-description = "A Rust library for parsing FOMOD mod-installer XML, evaluating conditions, and resolving install plans."
+description = "A Rust library that parses FOMOD mod installer XML, evaluates the wizard's conditions, and resolves selections into a deterministic plan of file operations."
 base_url = "/"
-footer_note = "Generated from repository metadata by the plinth-project FOSS sweep."
 
 [[nav]]
 label = "Overview"
@@ -10,26 +9,30 @@ href = "#overview"
 
 [[nav]]
 label = "Source"
-href = "ssh://git@codeberg.org/caniko/rs-fomod-oxide.git"
+href = "https://codeberg.org/caniko/rs-fomod-oxide"
+
+[[footer_links]]
+label = "crates.io"
+href = "https://crates.io/crates/fomod-oxide"
 
 [[footer_links]]
 label = "Source"
-href = "ssh://git@codeberg.org/caniko/rs-fomod-oxide.git"
+href = "https://codeberg.org/caniko/rs-fomod-oxide"
 
 [[pages]]
 slug = "index"
 title = "fomod-oxide"
-description = "A Rust library for parsing FOMOD mod-installer XML, evaluating conditions, and resolving install plans."
+description = "A Rust library that parses FOMOD mod installer XML, evaluates the wizard's conditions, and resolves selections into a deterministic plan of file operations."
 
 [[pages.sections]]
 type = "hero"
 title = "fomod-oxide"
-tagline = "Guided FOMOD mod installation in Rust"
-subtitle = "Parse installer XML, evaluate conditions, and resolve file operations into a deterministic plan."
+tagline = "Turn FOMOD installer XML into a checked install plan"
+subtitle = "A Rust library that parses ModuleConfig.xml and info.xml, evaluates the wizard's conditions against file states and flags, and resolves the chosen options into ordered file operations."
 
 [[pages.sections.ctas]]
 label = "View source"
-href = "ssh://git@codeberg.org/caniko/rs-fomod-oxide.git"
+href = "https://codeberg.org/caniko/rs-fomod-oxide"
 primary = true
 
 [[pages.sections]]
@@ -37,9 +40,17 @@ type = "feature_grid"
 id = "overview"
 
 [[pages.sections.features]]
-title = "Rust"
-description = "Project technology detected from repository manifests."
+title = "Parse the installer as it ships"
+description = "ModuleConfig.xml and info.xml deserialize into typed structs through quick-xml and serde, so a mod manager holds the wizard's steps, groups and plugins as data instead of walking raw XML. An Installer built from that config walks the wizard step by step."
 
 [[pages.sections.features]]
-title = "Nix"
-description = "Project technology detected from repository manifests."
+title = "Evaluate conditions against state"
+description = "Composite AND/OR dependency trees over file states, flags, game version and nested conditions decide which steps and plugins are visible. Group constraints such as SelectExactlyOne and SelectAtLeastOne are checked as options are chosen, and flag changes propagate to later steps."
+
+[[pages.sections.features]]
+title = "Resolve a plan, then execute it"
+description = "Selections collect file operations from required files, chosen plugins and conditional file installs, sorted by priority, so the whole install is inspectable before anything is written. Executing the plan copies those files into the target directory."
+
+[[pages.sections.features]]
+title = "Declarative installs with hash checks"
+description = "Skip the wizard by naming selections upfront in a declarative config with a schema version and SRI hashes in the nixpkgs rev and hash style; the library generates a defaults or all-options template to start from. The nix feature emits that config as a Nix expression or NixOS module fragment, and the cli feature builds a binary that writes it in Nix, RON or JSON."
