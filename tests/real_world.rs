@@ -1,12 +1,12 @@
 //! Integration tests using real-world FOMOD configs from the modding community.
 
-use std::collections::HashMap;
 use fomod_oxide::condition::EvalContext;
 use fomod_oxide::config::{GroupType, PluginType};
 use fomod_oxide::{
-    hash_xml, CompletionStatus, DeclarativeConfig, FileConflict, Installer,
-    ModuleConfig, SelectionSummary, SCHEMA_VERSION, ValidationHint,
+    hash_xml, CompletionStatus, DeclarativeConfig, FileConflict, Installer, ModuleConfig,
+    SelectionSummary, ValidationHint, SCHEMA_VERSION,
 };
+use std::collections::HashMap;
 
 // Verbatim from https://github.com/Nexus-Mods/Vortex/blob/master/tools/testfomod/fomod/ModuleConfig.xml
 const VORTEX_TEST: &str = include_str!("fixtures/vortex_test_config.xml");
@@ -197,18 +197,14 @@ fn hdtsmp_conditional_file_installs_se_cuda() {
     );
 
     // Other patterns should NOT match
-    assert!(
-        !plan
-            .operations
-            .iter()
-            .any(|op| op.source == "SE_NOCUDA\\SKSE"),
-    );
-    assert!(
-        !plan
-            .operations
-            .iter()
-            .any(|op| op.source == "AE_CUDA\\SKSE"),
-    );
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "SE_NOCUDA\\SKSE"),);
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "AE_CUDA\\SKSE"),);
 }
 
 #[test]
@@ -348,10 +344,10 @@ fn vortex_select_all_b_variants() {
 fn hdtsmp_all_conditional_file_combinations() {
     // Test each of the 4 conditional file patterns
     let combos = vec![
-        (vec![0], vec![0], "SE_CUDA\\SKSE"),    // SE + CUDA
-        (vec![0], vec![1], "SE_NOCUDA\\SKSE"),   // SE + No CUDA
-        (vec![1], vec![0], "AE_CUDA\\SKSE"),     // AE + CUDA
-        (vec![1], vec![1], "AE_NOCUDA\\SKSE"),   // AE + No CUDA
+        (vec![0], vec![0], "SE_CUDA\\SKSE"),   // SE + CUDA
+        (vec![0], vec![1], "SE_NOCUDA\\SKSE"), // SE + No CUDA
+        (vec![1], vec![0], "AE_CUDA\\SKSE"),   // AE + CUDA
+        (vec![1], vec![1], "AE_NOCUDA\\SKSE"), // AE + No CUDA
     ];
 
     for (platform_sel, cuda_sel, expected_source) in combos {
@@ -431,19 +427,11 @@ fn dep_type_fixture_parse_structure() {
     assert_eq!(steps.steps[1].name, "Compatibility");
 
     // Platform group has 3 plugins
-    let platform_group = &steps.steps[0]
-        .optional_file_groups
-        .as_ref()
-        .unwrap()
-        .groups[0];
+    let platform_group = &steps.steps[0].optional_file_groups.as_ref().unwrap().groups[0];
     assert_eq!(platform_group.plugins.plugins.len(), 3);
 
     // Results group has 3 plugins with dependencyType
-    let results = &steps.steps[1]
-        .optional_file_groups
-        .as_ref()
-        .unwrap()
-        .groups[0];
+    let results = &steps.steps[1].optional_file_groups.as_ref().unwrap().groups[0];
     assert_eq!(results.plugins.plugins.len(), 3);
 
     // All results have dependencyType (not simple type)
@@ -465,9 +453,18 @@ fn dep_type_default_types_without_context() {
         .groups[0];
 
     // Static types (without context): returns default types
-    assert_eq!(results.plugins.plugins[0].plugin_type(), PluginType::NotUsable);
-    assert_eq!(results.plugins.plugins[1].plugin_type(), PluginType::NotUsable);
-    assert_eq!(results.plugins.plugins[2].plugin_type(), PluginType::CouldBeUsable);
+    assert_eq!(
+        results.plugins.plugins[0].plugin_type(),
+        PluginType::NotUsable
+    );
+    assert_eq!(
+        results.plugins.plugins[1].plugin_type(),
+        PluginType::NotUsable
+    );
+    assert_eq!(
+        results.plugins.plugins[2].plugin_type(),
+        PluginType::CouldBeUsable
+    );
 }
 
 #[test]
@@ -482,9 +479,33 @@ fn dep_type_conditional_patterns_comprehensive() {
     // Test with each platform context
     let scenarios = vec![
         // (platform, os_family, expected_types_for_3_plugins)
-        ("windows", "desktop", vec![PluginType::Required, PluginType::Recommended, PluginType::CouldBeUsable]),
-        ("linux", "desktop", vec![PluginType::Recommended, PluginType::Recommended, PluginType::CouldBeUsable]),
-        ("steamdeck", "handheld", vec![PluginType::NotUsable, PluginType::Optional, PluginType::Required]),
+        (
+            "windows",
+            "desktop",
+            vec![
+                PluginType::Required,
+                PluginType::Recommended,
+                PluginType::CouldBeUsable,
+            ],
+        ),
+        (
+            "linux",
+            "desktop",
+            vec![
+                PluginType::Recommended,
+                PluginType::Recommended,
+                PluginType::CouldBeUsable,
+            ],
+        ),
+        (
+            "steamdeck",
+            "handheld",
+            vec![
+                PluginType::NotUsable,
+                PluginType::Optional,
+                PluginType::Required,
+            ],
+        ),
     ];
 
     for (platform, os_family, expected) in scenarios {
@@ -528,7 +549,11 @@ fn vortex_default_selections_in_context_with_dependency_type() {
         .groups[2];
 
     let defaults = Installer::default_selections_in_context(results_group, installer.context());
-    assert_eq!(defaults, vec![0], "First A (index 0) should be a default when Required");
+    assert_eq!(
+        defaults,
+        vec![0],
+        "First A (index 0) should be a default when Required"
+    );
 }
 
 // ---- Creative edge-case tests ----
@@ -556,12 +581,21 @@ fn vortex_rapid_group_switching_final_state() {
     let ctx = installer.context();
     assert_eq!(ctx.flags.get("fileanorec"), Some(&"On".to_string()));
     assert_eq!(ctx.flags.get("filearec"), Some(&"On".to_string()));
-    assert!(!ctx.flags.contains_key("filebnorec"), "filebnorec should be cleared");
-    assert!(!ctx.flags.contains_key("filebrec"), "filebrec should be cleared");
+    assert!(
+        !ctx.flags.contains_key("filebnorec"),
+        "filebnorec should be cleared"
+    );
+    assert!(
+        !ctx.flags.contains_key("filebrec"),
+        "filebrec should be cleared"
+    );
 
     // Plugin types in the Results group should reflect final state
     let results_group = &installer.config().install_steps.as_ref().unwrap().steps[0]
-        .optional_file_groups.as_ref().unwrap().groups[2];
+        .optional_file_groups
+        .as_ref()
+        .unwrap()
+        .groups[2];
 
     // "First A" → Required (fileanorec=On)
     assert_eq!(
@@ -615,20 +649,35 @@ fn hdtsmp_checkpoint_rollback_chain() {
     assert_eq!(installer.history_len(), 3);
 
     // Verify SE+CUDA state
-    assert_eq!(installer.context().flags.get("SSE"), Some(&"On".to_string()));
-    assert_eq!(installer.context().flags.get("CUDA"), Some(&"On".to_string()));
+    assert_eq!(
+        installer.context().flags.get("SSE"),
+        Some(&"On".to_string())
+    );
+    assert_eq!(
+        installer.context().flags.get("CUDA"),
+        Some(&"On".to_string())
+    );
 
     // Now select AE + No CUDA (simulating user changing mind)
     installer.select(1, 0, vec![1]); // AE → AE=On, SSE=Off
     installer.select(1, 1, vec![1]); // No CUDA → CUDA=Off
 
     assert_eq!(installer.context().flags.get("AE"), Some(&"On".to_string()));
-    assert_eq!(installer.context().flags.get("CUDA"), Some(&"Off".to_string()));
+    assert_eq!(
+        installer.context().flags.get("CUDA"),
+        Some(&"Off".to_string())
+    );
 
     // Rollback to checkpoint 3 (SE+CUDA)
     assert!(installer.rollback());
-    assert_eq!(installer.context().flags.get("SSE"), Some(&"On".to_string()));
-    assert_eq!(installer.context().flags.get("CUDA"), Some(&"On".to_string()));
+    assert_eq!(
+        installer.context().flags.get("SSE"),
+        Some(&"On".to_string())
+    );
+    assert_eq!(
+        installer.context().flags.get("CUDA"),
+        Some(&"On".to_string())
+    );
     assert_eq!(installer.history_len(), 2);
 
     // Rollback to checkpoint 2 (after Introduction, before Options)
@@ -657,7 +706,10 @@ fn dep_type_context_aware_defaults_change_with_flags() {
 
     let get_results_group = |inst: &Installer| -> Vec<usize> {
         let results = &inst.config().install_steps.as_ref().unwrap().steps[1]
-            .optional_file_groups.as_ref().unwrap().groups[0];
+            .optional_file_groups
+            .as_ref()
+            .unwrap()
+            .groups[0];
         Installer::default_selections_in_context(results, inst.context())
     };
 
@@ -669,16 +721,28 @@ fn dep_type_context_aware_defaults_change_with_flags() {
     installer.select(0, 0, vec![0]);
     let defaults_win = get_results_group(&installer);
     // "Windows Patch" → Required (idx 0), "Desktop Patch" → Recommended (idx 1)
-    assert!(defaults_win.contains(&0), "Windows Patch should be default for windows");
-    assert!(defaults_win.contains(&1), "Desktop Patch should be default for windows/desktop");
+    assert!(
+        defaults_win.contains(&0),
+        "Windows Patch should be default for windows"
+    );
+    assert!(
+        defaults_win.contains(&1),
+        "Desktop Patch should be default for windows/desktop"
+    );
 
     // Select Linux → platform=linux, os_family=desktop
     installer.select(0, 0, vec![1]);
     let defaults_linux = get_results_group(&installer);
     // "Windows Patch" → Recommended (os_family=desktop matches 2nd pattern)
     // "Desktop Patch" → Recommended
-    assert!(defaults_linux.contains(&0), "Windows Patch should be Recommended for linux/desktop");
-    assert!(defaults_linux.contains(&1), "Desktop Patch should be Recommended for linux/desktop");
+    assert!(
+        defaults_linux.contains(&0),
+        "Windows Patch should be Recommended for linux/desktop"
+    );
+    assert!(
+        defaults_linux.contains(&1),
+        "Desktop Patch should be Recommended for linux/desktop"
+    );
 
     // Select SteamDeck → platform=steamdeck, os_family=handheld
     installer.select(0, 0, vec![2]);
@@ -686,28 +750,46 @@ fn dep_type_context_aware_defaults_change_with_flags() {
     // "Windows Patch" → NotUsable (no pattern matches)
     // "Desktop Patch" → Optional (handheld pattern) → not a default
     // "CouldBeUsable Plugin" → Required (steamdeck pattern)
-    assert!(defaults_deck.contains(&2), "CouldBeUsable Plugin should be Required for steamdeck");
-    assert!(!defaults_deck.contains(&0), "Windows Patch should not be default for steamdeck");
+    assert!(
+        defaults_deck.contains(&2),
+        "CouldBeUsable Plugin should be Required for steamdeck"
+    );
+    assert!(
+        !defaults_deck.contains(&0),
+        "Windows Patch should not be default for steamdeck"
+    );
 
     // windows and linux both have indices [0, 1] as defaults but with different
     // underlying types (Required vs Recommended for index 0). The key difference
     // is between desktop (windows/linux) and handheld (steamdeck).
-    assert_ne!(defaults_linux, defaults_deck, "linux vs steamdeck defaults should differ");
-    assert_ne!(defaults_win, defaults_deck, "windows vs steamdeck defaults should differ");
+    assert_ne!(
+        defaults_linux, defaults_deck,
+        "linux vs steamdeck defaults should differ"
+    );
+    assert_ne!(
+        defaults_win, defaults_deck,
+        "windows vs steamdeck defaults should differ"
+    );
 
     // Verify the types are different even if default indices overlap.
     // Reset to Windows context to compare types.
     installer.select(0, 0, vec![0]);
     let win_type_0 = {
         let results = &installer.config().install_steps.as_ref().unwrap().steps[1]
-            .optional_file_groups.as_ref().unwrap().groups[0];
+            .optional_file_groups
+            .as_ref()
+            .unwrap()
+            .groups[0];
         results.plugins.plugins[0].plugin_type_in_context(installer.context())
     };
     // Reset to Linux context
     installer.select(0, 0, vec![1]);
     let linux_type_0 = {
         let results = &installer.config().install_steps.as_ref().unwrap().steps[1]
-            .optional_file_groups.as_ref().unwrap().groups[0];
+            .optional_file_groups
+            .as_ref()
+            .unwrap()
+            .groups[0];
         results.plugins.plugins[0].plugin_type_in_context(installer.context())
     };
     assert_ne!(
@@ -745,7 +827,10 @@ fn vortex_not_usable_produces_validation_hint() {
         ValidationHint::NotUsableSelected { plugin, .. } => plugin == "First A",
         _ => false,
     });
-    assert!(has_first_a, "Should specifically flag 'First A' as NotUsable");
+    assert!(
+        has_first_a,
+        "Should specifically flag 'First A' as NotUsable"
+    );
 
     // Also verify the NeedExactly hints for groups 0 and 1 (SelectExactlyOne, 0 selected)
     let need_hints: Vec<&ValidationHint> = hints
@@ -794,7 +879,10 @@ fn hdtsmp_detect_file_conflicts_required_vs_conditional() {
 
     // Verify detect_conflicts returns a valid (possibly empty) vec
     // The important thing is it doesn't panic on a config with conditional files
-    assert!(conflicts.len() < 100, "sanity check: not an unreasonable number of conflicts");
+    assert!(
+        conflicts.len() < 100,
+        "sanity check: not an unreasonable number of conflicts"
+    );
 }
 
 /// 6. Cross-fixture: declarative config diff between from_defaults and from_all.
@@ -826,14 +914,23 @@ fn cross_fixture_declarative_diff_defaults_vs_all() {
     assert!(platform_diff.is_some(), "Platform group should have a diff");
     let pd = platform_diff.unwrap();
     // defaults has no selection for Platform (no Recommended), all has all 3
-    assert!(pd.left.len() < pd.right.len(), "all should have more plugins than defaults");
+    assert!(
+        pd.left.len() < pd.right.len(),
+        "all should have more plugins than defaults"
+    );
 
     // Find the CUDA diff
     let cuda_diff = diffs.iter().find(|d| d.group == "CUDA");
     assert!(cuda_diff.is_some(), "CUDA group should have a diff");
     let cd = cuda_diff.unwrap();
-    assert!(cd.right.contains(&"CUDA".to_string()), "all should include CUDA");
-    assert!(cd.right.contains(&"No CUDA".to_string()), "all should include No CUDA");
+    assert!(
+        cd.right.contains(&"CUDA".to_string()),
+        "all should include CUDA"
+    );
+    assert!(
+        cd.right.contains(&"No CUDA".to_string()),
+        "all should include No CUDA"
+    );
 }
 
 /// 7. All fixtures: summary Display formatting.
@@ -943,11 +1040,17 @@ fn hdtsmp_preview_current_vs_resolve_conditional_difference() {
 
     // Both should include required files
     assert!(
-        preview.operations.iter().any(|op| op.source == "Licence.txt"),
+        preview
+            .operations
+            .iter()
+            .any(|op| op.source == "Licence.txt"),
         "preview should include required files"
     );
     assert!(
-        resolved.operations.iter().any(|op| op.source == "Licence.txt"),
+        resolved
+            .operations
+            .iter()
+            .any(|op| op.source == "Licence.txt"),
         "resolve should include required files"
     );
 
@@ -999,19 +1102,27 @@ fn dep_type_declarative_roundtrip_steamdeck() {
 
     // SteamDeck → platform=steamdeck → deck_extras.dll conditional should match
     assert!(
-        plan.operations.iter().any(|op| op.source == "deck_extras.dll"),
+        plan.operations
+            .iter()
+            .any(|op| op.source == "deck_extras.dll"),
         "SteamDeck should trigger deck_extras.dll conditional"
     );
 
     // desktop conditional should NOT match (os_family=handheld, not desktop)
     assert!(
-        !plan.operations.iter().any(|op| op.source == "desktop_extras.dll"),
+        !plan
+            .operations
+            .iter()
+            .any(|op| op.source == "desktop_extras.dll"),
         "SteamDeck should not trigger desktop_extras.dll"
     );
 
     // windows conditional should NOT match
     assert!(
-        !plan.operations.iter().any(|op| op.source == "win_extras.dll"),
+        !plan
+            .operations
+            .iter()
+            .any(|op| op.source == "win_extras.dll"),
         "SteamDeck should not trigger win_extras.dll"
     );
 
@@ -1046,7 +1157,10 @@ fn vortex_deterministic_reparse() {
     let plan2 = installer2.resolve();
 
     // Flags should be identical
-    assert_eq!(ctx1_flags, ctx2_flags, "Flags should be deterministic across re-parses");
+    assert_eq!(
+        ctx1_flags, ctx2_flags,
+        "Flags should be deterministic across re-parses"
+    );
 
     // Plans should have the same operations
     assert_eq!(
@@ -1057,7 +1171,10 @@ fn vortex_deterministic_reparse() {
 
     for (op1, op2) in plan1.operations.iter().zip(plan2.operations.iter()) {
         assert_eq!(op1.source, op2.source, "Sources should match");
-        assert_eq!(op1.destination, op2.destination, "Destinations should match");
+        assert_eq!(
+            op1.destination, op2.destination,
+            "Destinations should match"
+        );
         assert_eq!(op1.priority, op2.priority, "Priorities should match");
         assert_eq!(op1.is_folder, op2.is_folder, "is_folder should match");
     }
@@ -1124,7 +1241,10 @@ fn selection_diff_symmetry() {
     let bwd2 = dep_all.diff(&dep_defaults);
     assert_eq!(fwd2.len(), bwd2.len());
     for f in &fwd2 {
-        let b = bwd2.iter().find(|d| d.step == f.step && d.group == f.group).unwrap();
+        let b = bwd2
+            .iter()
+            .find(|d| d.step == f.step && d.group == f.group)
+            .unwrap();
         assert_eq!(f.left, b.right);
         assert_eq!(f.right, b.left);
     }
@@ -1189,10 +1309,7 @@ fn completion_status_fraction_edge_cases() {
         status_partial.fraction() > 0.0,
         "at least one group satisfied"
     );
-    assert!(
-        status_partial.fraction() < 1.0,
-        "not all groups satisfied"
-    );
+    assert!(status_partial.fraction() < 1.0, "not all groups satisfied");
 
     // Explicit 0.5 test: use CompletionStatus directly
     let half = CompletionStatus {

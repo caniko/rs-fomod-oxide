@@ -128,11 +128,10 @@ fn installer_resolve_full_flow() {
     assert!(plan.operations.iter().any(|op| op.source == "textures_4k"));
 
     // Conditional install triggered by texture_quality=high
-    assert!(
-        plan.operations
-            .iter()
-            .any(|op| op.source == "patches/hd_normals.esp")
-    );
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 
     // Standard textures should NOT be included
     assert!(!plan.operations.iter().any(|op| op.source == "textures_2k"));
@@ -152,12 +151,10 @@ fn installer_resolve_standard_textures() {
     assert!(plan.operations.iter().any(|op| op.source == "textures_2k"));
 
     // HD-only conditional NOT triggered
-    assert!(
-        !plan
-            .operations
-            .iter()
-            .any(|op| op.source == "patches/hd_normals.esp")
-    );
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -226,12 +223,10 @@ fn declarative_apply_selects_by_name() {
     // High-res NOT selected
     assert!(!plan.operations.iter().any(|op| op.source == "textures_4k"));
     // Conditional NOT triggered (texture_quality != high)
-    assert!(
-        !plan
-            .operations
-            .iter()
-            .any(|op| op.source == "patches/hd_normals.esp")
-    );
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -256,11 +251,10 @@ fn declarative_apply_high_res_with_conditional() {
 
     let plan = installer.resolve();
     assert!(plan.operations.iter().any(|op| op.source == "textures_4k"));
-    assert!(
-        plan.operations
-            .iter()
-            .any(|op| op.source == "patches/hd_normals.esp")
-    );
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -648,8 +642,14 @@ fn default_selections_in_context_picks_required_from_dependency_type() {
         .groups[0];
     let defaults = Installer::default_selections_in_context(results, installer.context());
     // Windows Patch → Required, Desktop Patch → Recommended → both selected
-    assert!(defaults.contains(&0), "Windows Patch should be a default (Required)");
-    assert!(defaults.contains(&1), "Desktop Patch should be a default (Recommended)");
+    assert!(
+        defaults.contains(&0),
+        "Windows Patch should be a default (Required)"
+    );
+    assert!(
+        defaults.contains(&1),
+        "Desktop Patch should be a default (Recommended)"
+    );
 }
 
 #[test]
@@ -661,23 +661,19 @@ fn multiple_conditional_patterns_both_match_for_windows() {
 
     let plan = installer.resolve();
     // Both desktop_extras and win_extras should be present (both conditions match)
-    assert!(
-        plan.operations
-            .iter()
-            .any(|op| op.source == "desktop_extras.dll")
-    );
-    assert!(
-        plan.operations
-            .iter()
-            .any(|op| op.source == "win_extras.dll")
-    );
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "desktop_extras.dll"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "win_extras.dll"));
     // SteamDeck extras should NOT match
-    assert!(
-        !plan
-            .operations
-            .iter()
-            .any(|op| op.source == "deck_extras.dll")
-    );
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "deck_extras.dll"));
 }
 
 // =====================================================================
@@ -799,13 +795,25 @@ fn flags_from_different_groups_coexist() {
     installer.select(0, 1, vec![1]); // G2: B2 → g2_flag=b2
 
     // Both flags should coexist
-    assert_eq!(installer.context().flags.get("g1_flag"), Some(&"a1".to_string()));
-    assert_eq!(installer.context().flags.get("g2_flag"), Some(&"b2".to_string()));
+    assert_eq!(
+        installer.context().flags.get("g1_flag"),
+        Some(&"a1".to_string())
+    );
+    assert_eq!(
+        installer.context().flags.get("g2_flag"),
+        Some(&"b2".to_string())
+    );
 
     // Reselect G1 → only g1_flag changes, g2_flag untouched
     installer.select(0, 0, vec![1]); // G1: B1 → g1_flag=b1
-    assert_eq!(installer.context().flags.get("g1_flag"), Some(&"b1".to_string()));
-    assert_eq!(installer.context().flags.get("g2_flag"), Some(&"b2".to_string()));
+    assert_eq!(
+        installer.context().flags.get("g1_flag"),
+        Some(&"b1".to_string())
+    );
+    assert_eq!(
+        installer.context().flags.get("g2_flag"),
+        Some(&"b2".to_string())
+    );
 }
 
 // =====================================================================
@@ -818,7 +826,9 @@ fn declarative_nix_roundtrip_dep_type_fixture() {
     let decl = DeclarativeConfig::from_defaults(DEP_TYPE_XML, "1.0", &config);
     let nix_str = ronix::to_nix(&decl).unwrap();
 
-    assert!(nix_str.contains("DependencyType Patterns Test") || nix_str.contains("Choose Platform"));
+    assert!(
+        nix_str.contains("DependencyType Patterns Test") || nix_str.contains("Choose Platform")
+    );
     assert!(nix_str.contains("sha256-"));
 }
 
@@ -858,9 +868,20 @@ fn cross_fixture_from_defaults_matches_manual_defaults() {
     let plan_b = installer_b.resolve();
 
     // Both plans should produce the same set of source files
-    let sources_a: Vec<&str> = plan_a.operations.iter().map(|op| op.source.as_str()).collect();
-    let sources_b: Vec<&str> = plan_b.operations.iter().map(|op| op.source.as_str()).collect();
-    assert_eq!(sources_a, sources_b, "declarative defaults should match manual defaults");
+    let sources_a: Vec<&str> = plan_a
+        .operations
+        .iter()
+        .map(|op| op.source.as_str())
+        .collect();
+    let sources_b: Vec<&str> = plan_b
+        .operations
+        .iter()
+        .map(|op| op.source.as_str())
+        .collect();
+    assert_eq!(
+        sources_a, sources_b,
+        "declarative defaults should match manual defaults"
+    );
 }
 
 // =====================================================================
@@ -880,12 +901,18 @@ fn version_comparison_four_segment() {
     let mut ctx = EvalContext::new();
     ctx.game_version = Some("1.0.0.0".into());
     let installer = Installer::with_context(config.clone(), ctx);
-    assert!(installer.check_dependencies(), "exact 4-segment match should pass");
+    assert!(
+        installer.check_dependencies(),
+        "exact 4-segment match should pass"
+    );
 
     let mut ctx = EvalContext::new();
     ctx.game_version = Some("1.0.0.1".into());
     let installer = Installer::with_context(config.clone(), ctx);
-    assert!(installer.check_dependencies(), "higher 4th segment should pass");
+    assert!(
+        installer.check_dependencies(),
+        "higher 4th segment should pass"
+    );
 
     let mut ctx = EvalContext::new();
     ctx.game_version = Some("0.9.9.9".into());
@@ -906,12 +933,18 @@ fn version_comparison_single_segment() {
     let mut ctx = EvalContext::new();
     ctx.game_version = Some("1".into());
     let installer = Installer::with_context(config.clone(), ctx);
-    assert!(installer.check_dependencies(), "single segment equal should pass");
+    assert!(
+        installer.check_dependencies(),
+        "single segment equal should pass"
+    );
 
     let mut ctx = EvalContext::new();
     ctx.game_version = Some("2".into());
     let installer = Installer::with_context(config, ctx);
-    assert!(installer.check_dependencies(), "higher single segment should pass");
+    assert!(
+        installer.check_dependencies(),
+        "higher single segment should pass"
+    );
 }
 
 #[test]
@@ -960,13 +993,19 @@ fn deeply_nested_conditions_5_levels() {
 
     // Without the flag → should fail (all And-chains leading to a flag check)
     let installer = Installer::new(config.clone());
-    assert!(!installer.check_dependencies(), "missing deep flag should fail");
+    assert!(
+        !installer.check_dependencies(),
+        "missing deep flag should fail"
+    );
 
     // With the flag → should pass
     let mut ctx = EvalContext::new();
     ctx.set_flag("deep", "yes");
     let installer = Installer::with_context(config, ctx);
-    assert!(installer.check_dependencies(), "deep flag present should pass");
+    assert!(
+        installer.check_dependencies(),
+        "deep flag present should pass"
+    );
 }
 
 // =====================================================================
@@ -978,7 +1017,9 @@ fn large_config_stress_test() {
     // Generate XML with 10 steps, each with 3 groups and 5 plugins
     let mut xml = String::from(r#"<config><moduleName>StressTest</moduleName><installSteps>"#);
     for step in 0..10 {
-        xml.push_str(&format!(r#"<installStep name="Step{step}"><optionalFileGroups>"#));
+        xml.push_str(&format!(
+            r#"<installStep name="Step{step}"><optionalFileGroups>"#
+        ));
         for group in 0..3 {
             xml.push_str(&format!(
                 r#"<group name="Group{group}" type="SelectAny"><plugins>"#
@@ -1095,8 +1136,15 @@ fn duplicate_plugin_indices_in_selection() {
     assert!(plan.operations.iter().any(|op| op.source == "b.esp"));
 
     // The duplicate should result in a.esp appearing twice in operations
-    let a_count = plan.operations.iter().filter(|op| op.source == "a.esp").count();
-    assert_eq!(a_count, 2, "duplicate index should produce duplicate file ops");
+    let a_count = plan
+        .operations
+        .iter()
+        .filter(|op| op.source == "a.esp")
+        .count();
+    assert_eq!(
+        a_count, 2,
+        "duplicate index should produce duplicate file ops"
+    );
 }
 
 // =====================================================================
@@ -1220,11 +1268,17 @@ fn conditional_file_installs_no_matching_patterns() {
     assert!(plan.operations.iter().any(|op| op.source == "a.esp"));
     // Neither conditional pattern should fire
     assert!(
-        !plan.operations.iter().any(|op| op.source == "beta_patch.esp"),
+        !plan
+            .operations
+            .iter()
+            .any(|op| op.source == "beta_patch.esp"),
         "beta pattern should not match when choice=alpha"
     );
     assert!(
-        !plan.operations.iter().any(|op| op.source == "gamma_patch.esp"),
+        !plan
+            .operations
+            .iter()
+            .any(|op| op.source == "gamma_patch.esp"),
         "gamma pattern should not match when choice=alpha"
     );
 }
