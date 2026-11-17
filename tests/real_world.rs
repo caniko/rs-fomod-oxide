@@ -559,8 +559,8 @@ fn vortex_default_selections_in_context_with_dependency_type() {
 // ---- Creative edge-case tests ----
 
 /// 1. Vortex: switching all groups rapidly and verifying final state.
-/// Select A in both groups, then B in both, then A again. Verify flags,
-/// plugin types, and resolved plan are consistent.
+///    Select A in both groups, then B in both, then A again. Verify flags,
+///    plugin types, and resolved plan are consistent.
 #[test]
 fn vortex_rapid_group_switching_final_state() {
     let config = ModuleConfig::parse(VORTEX_TEST).unwrap();
@@ -626,8 +626,8 @@ fn vortex_rapid_group_switching_final_state() {
 }
 
 /// 2. HDTSMP: checkpoint at every step and rollback chain.
-/// Use checkpoint/rollback through the 3-step wizard. Verify state is correct
-/// at each level.
+///    Use checkpoint/rollback through the 3-step wizard. Verify state is correct
+///    at each level.
 #[test]
 fn hdtsmp_checkpoint_rollback_chain() {
     let config = ModuleConfig::parse(HDTSMP_LIKE).unwrap();
@@ -697,8 +697,8 @@ fn hdtsmp_checkpoint_rollback_chain() {
 }
 
 /// 3. Dep type: context-aware defaults change as flags evolve.
-/// Select each platform and verify default_selections_in_context returns
-/// different results for the Results group.
+///    Select each platform and verify default_selections_in_context returns
+///    different results for the Results group.
 #[test]
 fn dep_type_context_aware_defaults_change_with_flags() {
     let config = ModuleConfig::parse(DEP_TYPE_XML).unwrap();
@@ -799,8 +799,8 @@ fn dep_type_context_aware_defaults_change_with_flags() {
 }
 
 /// 4. Vortex: NotUsable plugins should produce ValidationHint when selected.
-/// Select a NotUsable plugin (via dependencyType) and verify validate_step
-/// produces NotUsableSelected hint.
+///    Select a NotUsable plugin (via dependencyType) and verify validate_step
+///    produces NotUsableSelected hint.
 #[test]
 fn vortex_not_usable_produces_validation_hint() {
     let config = ModuleConfig::parse(VORTEX_TEST).unwrap();
@@ -844,7 +844,7 @@ fn vortex_not_usable_produces_validation_hint() {
 }
 
 /// 5. HDTSMP: detect file conflicts between required files and conditional.
-/// Required files + conditional files going to same destination should show up.
+///    Required files + conditional files going to same destination should show up.
 #[test]
 fn hdtsmp_detect_file_conflicts_required_vs_conditional() {
     // The HDTSMP fixture has required files (Licence.txt, Readme.txt) and conditional
@@ -886,7 +886,7 @@ fn hdtsmp_detect_file_conflicts_required_vs_conditional() {
 }
 
 /// 6. Cross-fixture: declarative config diff between from_defaults and from_all.
-/// Show the diff captures all the extra plugins.
+///    Show the diff captures all the extra plugins.
 #[test]
 fn cross_fixture_declarative_diff_defaults_vs_all() {
     let config = ModuleConfig::parse(HDTSMP_LIKE).unwrap();
@@ -934,7 +934,7 @@ fn cross_fixture_declarative_diff_defaults_vs_all() {
 }
 
 /// 7. All fixtures: summary Display formatting.
-/// Verify SelectionSummary Display output format.
+///    Verify SelectionSummary Display output format.
 #[test]
 fn all_fixtures_summary_display_formatting() {
     let fixtures = [
@@ -999,7 +999,7 @@ fn all_fixtures_summary_display_formatting() {
 }
 
 /// 8. HDTSMP: preview_current vs resolve shows conditional difference.
-/// preview_current should NOT include conditional SKSE files, but resolve should.
+///    preview_current should NOT include conditional SKSE files, but resolve should.
 #[test]
 fn hdtsmp_preview_current_vs_resolve_conditional_difference() {
     let config = ModuleConfig::parse(HDTSMP_LIKE).unwrap();
@@ -1064,8 +1064,8 @@ fn hdtsmp_preview_current_vs_resolve_conditional_difference() {
 }
 
 /// 9. Dep type: full declarative roundtrip with context-aware selections.
-/// Create declarative config manually for SteamDeck, apply, verify correct
-/// conditionals triggered.
+///    Create declarative config manually for SteamDeck, apply, verify correct
+///    conditionals triggered.
 #[test]
 fn dep_type_declarative_roundtrip_steamdeck() {
     let _config = ModuleConfig::parse(DEP_TYPE_XML).unwrap();
@@ -1134,8 +1134,8 @@ fn dep_type_declarative_roundtrip_steamdeck() {
 }
 
 /// 10. Vortex: re-parse config after each selection step.
-/// Verify that creating new installer + applying same selections gives
-/// same result (determinism).
+///     Verify that creating new installer + applying same selections gives
+///     same result (determinism).
 #[test]
 fn vortex_deterministic_reparse() {
     // First run
@@ -1193,7 +1193,7 @@ fn vortex_deterministic_reparse() {
 }
 
 /// 11. SelectionDiff symmetry.
-/// diff(a, b) should be mirror of diff(b, a) for the same step/group pairs.
+///     diff(a, b) should be mirror of diff(b, a) for the same step/group pairs.
 #[test]
 fn selection_diff_symmetry() {
     let config = ModuleConfig::parse(HDTSMP_LIKE).unwrap();
@@ -1251,7 +1251,7 @@ fn selection_diff_symmetry() {
 }
 
 /// 12. completion_status fraction edge cases.
-/// 0 groups -> 1.0, 1/2 -> 0.5, 3/3 -> 1.0
+///     0 groups -> 1.0, 1/2 -> 0.5, 3/3 -> 1.0
 #[test]
 fn completion_status_fraction_edge_cases() {
     // 0 groups → 1.0 (no config with steps)
@@ -1276,7 +1276,7 @@ fn completion_status_fraction_edge_cases() {
     );
     // fraction should be between 0 and 1 (some groups auto-satisfy, some don't)
     let frac_empty = status_empty.fraction();
-    assert!(frac_empty >= 0.0 && frac_empty <= 1.0, "fraction in [0,1]");
+    assert!((0.0..=1.0).contains(&frac_empty), "fraction in [0,1]");
 
     // Satisfy all visible groups
     installer_h.select(0, 0, vec![0]); // Introduction: SelectAll, 1 plugin
