@@ -326,7 +326,7 @@ impl Installer {
     pub fn preview_plugin(&self, step: usize, group: usize, plugin: usize) -> Vec<FileOperation> {
         self.get_plugin(step, group, plugin)
             .and_then(|p| p.files.as_ref())
-            .map(|files| files_to_ops(files))
+            .map(files_to_ops)
             .unwrap_or_default()
     }
 

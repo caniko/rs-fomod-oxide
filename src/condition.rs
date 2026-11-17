@@ -121,7 +121,7 @@ impl Evaluate for FommDependency {
 fn check_version(current: &Option<String>, required: &str) -> bool {
     current
         .as_ref()
-        .map_or(false, |c| compare_versions(c, required))
+        .is_some_and(|c| compare_versions(c, required))
 }
 
 /// Simple version comparison: current >= required.
