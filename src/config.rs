@@ -674,7 +674,12 @@ mod tests {
             <requiredInstallFiles></requiredInstallFiles></config>
         "#;
         let config = ModuleConfig::parse(xml).unwrap();
-        assert!(config.required_install_files.as_ref().unwrap().items.is_empty());
+        assert!(config
+            .required_install_files
+            .as_ref()
+            .unwrap()
+            .items
+            .is_empty());
     }
 
     #[test]

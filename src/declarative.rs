@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
+use base64::Engine;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -545,10 +545,7 @@ mod tests {
         let config = ModuleConfig::parse(SIMPLE_XML).unwrap();
         let decl = DeclarativeConfig::from_all(SIMPLE_XML, "1.0", &config);
         let plugins = &decl.selections["Step1"]["Group1"];
-        assert_eq!(
-            plugins,
-            &vec!["PluginA".to_string(), "PluginB".to_string()]
-        );
+        assert_eq!(plugins, &vec!["PluginA".to_string(), "PluginB".to_string()]);
     }
 
     // ---- apply ----
@@ -564,10 +561,7 @@ mod tests {
             selections: HashMap::new(),
         };
         let err = decl.apply(SIMPLE_XML, &mut installer).unwrap_err();
-        assert!(matches!(
-            err,
-            DeclarativeError::UnsupportedVersion { .. }
-        ));
+        assert!(matches!(err, DeclarativeError::UnsupportedVersion { .. }));
     }
 
     #[test]
@@ -658,10 +652,7 @@ mod tests {
             hash: hash_xml(SIMPLE_XML),
             selections: HashMap::from([(
                 "Step1".into(),
-                HashMap::from([(
-                    "Group1".into(),
-                    vec!["PluginA".into(), "PluginB".into()],
-                )]),
+                HashMap::from([("Group1".into(), vec!["PluginA".into(), "PluginB".into()])]),
             )]),
         };
         let err = decl.apply(SIMPLE_XML, &mut installer).unwrap_err();
