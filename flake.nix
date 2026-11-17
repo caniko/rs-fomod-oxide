@@ -1,6 +1,6 @@
 {
   inputs = {
-    rs-harbor.url = "git+ssh://git@github.com/caniko/rs-harbor.git?ref=trunk&rev=05cc4f162b55fa904b687db1821e2463fa813e50";
+    rs-harbor.url = "git+ssh://git@github.com/caniko/rs-harbor.git?ref=trunk&rev=ed89d0b13fc61dd1b2217bf4bba97f32cec27ba7";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     crane.url = "github:ipetkov/crane";
     flake-utils.url = "github:numtide/flake-utils";
@@ -45,6 +45,8 @@
           inherit pkgs;
           sccachePackage = rs-harbor.packages.${system}.sccache;
           cacheRoot = null;
+          # Hosted CI runners have no managed sccache transport.
+          ephemeralFallback = true;
           namespaceScope = "canix-rust";
           namespaceGeneration = 5;
         };
