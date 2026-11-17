@@ -7,7 +7,10 @@ use clap::{Parser, ValueEnum};
 use fomod_oxide::{DeclarativeConfig, FomodInfo, ModuleConfig};
 
 #[derive(Parser)]
-#[command(name = "fomod-oxide", about = "Generate declarative configs from FOMOD installers")]
+#[command(
+    name = "fomod-oxide",
+    about = "Generate declarative configs from FOMOD installers"
+)]
 struct Cli {
     /// Path to ModuleConfig.xml
     input: PathBuf,

@@ -3,12 +3,11 @@
 use std::collections::HashMap;
 
 use fomod_oxide::condition::{EvalContext, FileState};
-use fomod_oxide::Evaluate;
 use fomod_oxide::config::{GroupType, PluginType};
+use fomod_oxide::Evaluate;
 use fomod_oxide::{
-    hash_xml, DeclarativeConfig, DeclarativeError,
-    FileConflictSource, FomodError, FomodInfo, Installer, ModuleConfig,
-    SelectionSummary, ValidationHint, SCHEMA_VERSION,
+    hash_xml, DeclarativeConfig, DeclarativeError, FileConflictSource, FomodError, FomodInfo,
+    Installer, ModuleConfig, SelectionSummary, ValidationHint, SCHEMA_VERSION,
 };
 
 // =====================================================================
@@ -94,7 +93,12 @@ fn parse_empty_required_files() {
         <requiredInstallFiles></requiredInstallFiles></config>
     "#;
     let config = ModuleConfig::parse(xml).unwrap();
-    assert!(config.required_install_files.as_ref().unwrap().items.is_empty());
+    assert!(config
+        .required_install_files
+        .as_ref()
+        .unwrap()
+        .items
+        .is_empty());
 }
 
 #[test]
@@ -275,7 +279,12 @@ fn deeply_nested_conditional_file_installs() {
     let xml = include_str!("fixtures/nested_conditions.xml");
     let config = ModuleConfig::parse(xml).unwrap();
 
-    let pattern = &config.conditional_file_installs.as_ref().unwrap().patterns.patterns[0];
+    let pattern = &config
+        .conditional_file_installs
+        .as_ref()
+        .unwrap()
+        .patterns
+        .patterns[0];
 
     // A + B → true (B satisfies the OR)
     let mut ctx = EvalContext::new();
@@ -808,10 +817,7 @@ fn declarative_partial_selections_use_defaults() {
         hash: hash_xml(xml),
         selections: HashMap::from([(
             "Step 1".into(),
-            HashMap::from([(
-                "Any".into(),
-                vec!["Whatever A".into(), "Whatever C".into()],
-            )]),
+            HashMap::from([("Any".into(), vec!["Whatever A".into(), "Whatever C".into()])]),
         )]),
     };
 
@@ -836,10 +842,7 @@ fn declarative_apply_sets_flags_correctly() {
         hash: hash_xml(xml),
         selections: HashMap::from([(
             "Choose Textures".into(),
-            HashMap::from([(
-                "Texture Quality".into(),
-                vec!["High Resolution".into()],
-            )]),
+            HashMap::from([("Texture Quality".into(), vec!["High Resolution".into()])]),
         )]),
     };
 
@@ -988,9 +991,7 @@ fn parse_name_position_all_variants() {
             fomod_oxide::config::NamePosition::RightOfImage,
         ),
     ] {
-        let xml = format!(
-            r#"<config><moduleName position="{pos}">Test</moduleName></config>"#
-        );
+        let xml = format!(r#"<config><moduleName position="{pos}">Test</moduleName></config>"#);
         let config = ModuleConfig::parse(&xml).unwrap();
         assert_eq!(config.module_name.position, Some(expected));
     }
@@ -1099,10 +1100,7 @@ fn parse_dependency_type_with_patterns() {
     // Context with y=2 → Recommended (second pattern)
     let mut ctx = EvalContext::new();
     ctx.set_flag("y", "2");
-    assert_eq!(
-        plugin.plugin_type_in_context(&ctx),
-        PluginType::Recommended
-    );
+    assert_eq!(plugin.plugin_type_in_context(&ctx), PluginType::Recommended);
 
     // Context with both x=1 and y=2 → Required (first match wins)
     let mut ctx = EvalContext::new();
@@ -1212,14 +1210,7 @@ fn parse_empty_condition_flags() {
         .groups[0]
         .plugins
         .plugins[0];
-    assert!(
-        plugin
-            .condition_flags
-            .as_ref()
-            .unwrap()
-            .flags
-            .is_empty()
-    );
+    assert!(plugin.condition_flags.as_ref().unwrap().flags.is_empty());
 }
 
 #[test]
@@ -1486,11 +1477,10 @@ fn multiple_conditional_patterns_all_matching() {
     // All three conditional patterns should match
     assert!(plan.operations.iter().any(|op| op.source == "from_a.esp"));
     assert!(plan.operations.iter().any(|op| op.source == "from_b.esp"));
-    assert!(
-        plan.operations
-            .iter()
-            .any(|op| op.source == "from_both.esp")
-    );
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "from_both.esp"));
 }
 
 #[test]
@@ -1534,11 +1524,19 @@ fn selecting_empty_list_clears_previous() {
 
     // Select A
     installer.select(0, 0, vec![0]);
-    assert!(installer.resolve().operations.iter().any(|op| op.source == "a.esp"));
+    assert!(installer
+        .resolve()
+        .operations
+        .iter()
+        .any(|op| op.source == "a.esp"));
 
     // Deselect all (SelectAny allows empty)
     installer.select(0, 0, vec![]);
-    assert!(!installer.resolve().operations.iter().any(|op| op.source == "a.esp"));
+    assert!(!installer
+        .resolve()
+        .operations
+        .iter()
+        .any(|op| op.source == "a.esp"));
     // Flag should be cleared
     assert!(!installer.context().flags.contains_key("sel"));
 }
@@ -1762,8 +1760,7 @@ fn selection_error_display_messages() {
 
 #[test]
 fn selection_error_is_std_error() {
-    let e: Box<dyn std::error::Error> =
-        Box::new(fomod_oxide::SelectionError::OutOfBounds);
+    let e: Box<dyn std::error::Error> = Box::new(fomod_oxide::SelectionError::OutOfBounds);
     assert!(!e.to_string().is_empty());
 }
 
@@ -2001,7 +1998,11 @@ fn validate_step_need_exactly_one() {
     let hints = installer.validate_step(0);
     assert_eq!(hints.len(), 1);
     match &hints[0] {
-        ValidationHint::NeedExactly { group, required, current } => {
+        ValidationHint::NeedExactly {
+            group,
+            required,
+            current,
+        } => {
             assert_eq!(group, "G1");
             assert_eq!(*required, 1);
             assert_eq!(*current, 0);
@@ -2027,7 +2028,11 @@ fn validate_step_need_at_least_one() {
     let hints = installer.validate_step(0);
     assert_eq!(hints.len(), 1);
     match &hints[0] {
-        ValidationHint::NeedAtLeast { group, required, current } => {
+        ValidationHint::NeedAtLeast {
+            group,
+            required,
+            current,
+        } => {
             assert_eq!(group, "G");
             assert_eq!(*required, 1);
             assert_eq!(*current, 0);
@@ -2055,7 +2060,11 @@ fn validate_step_exceeds_max() {
     let hints = installer.validate_step(0);
     assert_eq!(hints.len(), 1);
     match &hints[0] {
-        ValidationHint::ExceedsMax { group, max, current } => {
+        ValidationHint::ExceedsMax {
+            group,
+            max,
+            current,
+        } => {
             assert_eq!(group, "G");
             assert_eq!(*max, 1);
             assert_eq!(*current, 2);
@@ -2115,7 +2124,11 @@ fn validate_step_select_all_incomplete() {
     let hints = installer.validate_step(0);
     assert_eq!(hints.len(), 1);
     match &hints[0] {
-        ValidationHint::NeedExactly { group, required, current } => {
+        ValidationHint::NeedExactly {
+            group,
+            required,
+            current,
+        } => {
             assert_eq!(group, "G");
             assert_eq!(*required, 3);
             assert_eq!(*current, 1);
@@ -2188,8 +2201,14 @@ fn detect_conflicts_required_vs_plugin() {
     assert_eq!(conflicts.len(), 1);
     assert_eq!(conflicts[0].destination, "data/shared.esp");
     // Should have both a Required and a Plugin source
-    let has_required = conflicts[0].sources.iter().any(|s| matches!(s, FileConflictSource::Required { .. }));
-    let has_plugin = conflicts[0].sources.iter().any(|s| matches!(s, FileConflictSource::Plugin { .. }));
+    let has_required = conflicts[0]
+        .sources
+        .iter()
+        .any(|s| matches!(s, FileConflictSource::Required { .. }));
+    let has_plugin = conflicts[0]
+        .sources
+        .iter()
+        .any(|s| matches!(s, FileConflictSource::Plugin { .. }));
     assert!(has_required);
     assert!(has_plugin);
 }
@@ -2280,8 +2299,12 @@ fn flag_impact_map_multi_impact() {
     let impacts = installer.flag_impact_map();
     // SetA -> Step2, SetB -> Step3
     assert_eq!(impacts.len(), 2);
-    assert!(impacts.iter().any(|i| i.flag_name == "flagA" && i.affected_step_name == "Step2"));
-    assert!(impacts.iter().any(|i| i.flag_name == "flagB" && i.affected_step_name == "Step3"));
+    assert!(impacts
+        .iter()
+        .any(|i| i.flag_name == "flagA" && i.affected_step_name == "Step2"));
+    assert!(impacts
+        .iter()
+        .any(|i| i.flag_name == "flagB" && i.affected_step_name == "Step3"));
 }
 
 // =====================================================================
@@ -2464,11 +2487,20 @@ fn preview_current_excludes_conditionals() {
 
     // preview should not include the conditional bonus.esp
     let preview_has_bonus = preview.operations.iter().any(|op| op.source == "bonus.esp");
-    assert!(!preview_has_bonus, "preview_current should exclude conditional files");
+    assert!(
+        !preview_has_bonus,
+        "preview_current should exclude conditional files"
+    );
 
     // resolve should include it
-    let resolve_has_bonus = resolved.operations.iter().any(|op| op.source == "bonus.esp");
-    assert!(resolve_has_bonus, "resolve should include conditional files");
+    let resolve_has_bonus = resolved
+        .operations
+        .iter()
+        .any(|op| op.source == "bonus.esp");
+    assert!(
+        resolve_has_bonus,
+        "resolve should include conditional files"
+    );
 
     // Both should have base.esp and a.esp
     assert!(preview.operations.iter().any(|op| op.source == "base.esp"));
@@ -2543,7 +2575,10 @@ fn plugin_image_path_present_and_absent() {
     </installStep></installSteps></config>"#;
     let config = ModuleConfig::parse(xml).unwrap();
     let installer = Installer::new(config);
-    assert_eq!(installer.plugin_image_path(0, 0, 0), Some("images/preview.png"));
+    assert_eq!(
+        installer.plugin_image_path(0, 0, 0),
+        Some("images/preview.png")
+    );
     assert_eq!(installer.plugin_image_path(0, 0, 1), None);
     assert_eq!(installer.plugin_image_path(0, 0, 99), None);
 }
@@ -2581,10 +2616,22 @@ fn plugin_type_at_valid() {
     </installStep></installSteps></config>"#;
     let config = ModuleConfig::parse(xml).unwrap();
     let installer = Installer::new(config);
-    assert_eq!(installer.plugin_type_at(0, 0, 0), Some(PluginType::Required));
-    assert_eq!(installer.plugin_type_at(0, 0, 1), Some(PluginType::Recommended));
-    assert_eq!(installer.plugin_type_at(0, 0, 2), Some(PluginType::Optional));
-    assert_eq!(installer.plugin_type_at(0, 0, 3), Some(PluginType::NotUsable));
+    assert_eq!(
+        installer.plugin_type_at(0, 0, 0),
+        Some(PluginType::Required)
+    );
+    assert_eq!(
+        installer.plugin_type_at(0, 0, 1),
+        Some(PluginType::Recommended)
+    );
+    assert_eq!(
+        installer.plugin_type_at(0, 0, 2),
+        Some(PluginType::Optional)
+    );
+    assert_eq!(
+        installer.plugin_type_at(0, 0, 3),
+        Some(PluginType::NotUsable)
+    );
     assert_eq!(installer.plugin_type_at(0, 0, 99), None);
 }
 
@@ -2613,9 +2660,18 @@ fn group_type_at_valid_and_invalid() {
     </installStep></installSteps></config>"#;
     let config = ModuleConfig::parse(xml).unwrap();
     let installer = Installer::new(config);
-    assert_eq!(installer.group_type_at(0, 0), Some(GroupType::SelectExactlyOne));
-    assert_eq!(installer.group_type_at(0, 1), Some(GroupType::SelectAtMostOne));
-    assert_eq!(installer.group_type_at(0, 2), Some(GroupType::SelectAtLeastOne));
+    assert_eq!(
+        installer.group_type_at(0, 0),
+        Some(GroupType::SelectExactlyOne)
+    );
+    assert_eq!(
+        installer.group_type_at(0, 1),
+        Some(GroupType::SelectAtMostOne)
+    );
+    assert_eq!(
+        installer.group_type_at(0, 2),
+        Some(GroupType::SelectAtLeastOne)
+    );
     assert_eq!(installer.group_type_at(0, 3), Some(GroupType::SelectAll));
     assert_eq!(installer.group_type_at(0, 4), Some(GroupType::SelectAny));
     assert_eq!(installer.group_type_at(0, 99), None);
@@ -2633,7 +2689,10 @@ fn validation_hint_display_need_exactly() {
         required: 1,
         current: 0,
     };
-    assert_eq!(hint.to_string(), "Textures: need exactly 1, have 0 selected");
+    assert_eq!(
+        hint.to_string(),
+        "Textures: need exactly 1, have 0 selected"
+    );
 }
 
 #[test]
@@ -2643,7 +2702,10 @@ fn validation_hint_display_need_at_least() {
         required: 1,
         current: 0,
     };
-    assert_eq!(hint.to_string(), "Patches: need at least 1, have 0 selected");
+    assert_eq!(
+        hint.to_string(),
+        "Patches: need at least 1, have 0 selected"
+    );
 }
 
 #[test]
@@ -2653,7 +2715,10 @@ fn validation_hint_display_exceeds_max() {
         max: 1,
         current: 3,
     };
-    assert_eq!(hint.to_string(), "Options: at most 1 allowed, have 3 selected");
+    assert_eq!(
+        hint.to_string(),
+        "Options: at most 1 allowed, have 3 selected"
+    );
 }
 
 #[test]

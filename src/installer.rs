@@ -89,11 +89,7 @@ fn apply_sort_orders(config: &mut ModuleConfig) {
                 apply_sort_order(&mut groups.groups, groups.order, |g| &g.name);
 
                 for group in &mut groups.groups {
-                    apply_sort_order(
-                        &mut group.plugins.plugins,
-                        group.plugins.order,
-                        |p| &p.name,
-                    );
+                    apply_sort_order(&mut group.plugins.plugins, group.plugins.order, |p| &p.name);
                 }
             }
         }
@@ -327,12 +323,7 @@ impl Installer {
     // ─── Install Plan Preview ────────────────────────────────────
 
     /// Preview the file operations a specific plugin would contribute.
-    pub fn preview_plugin(
-        &self,
-        step: usize,
-        group: usize,
-        plugin: usize,
-    ) -> Vec<FileOperation> {
+    pub fn preview_plugin(&self, step: usize, group: usize, plugin: usize) -> Vec<FileOperation> {
         self.get_plugin(step, group, plugin)
             .and_then(|p| p.files.as_ref())
             .map(|files| files_to_ops(files))
@@ -526,16 +517,15 @@ impl Installer {
                                 for item in &files.items {
                                     let r = item.file_ref();
                                     let dest = normalize_dest(&r.source, &r.destination);
-                                    dest_map
-                                        .entry(dest)
-                                        .or_default()
-                                        .push(FileConflictSource::Plugin {
+                                    dest_map.entry(dest).or_default().push(
+                                        FileConflictSource::Plugin {
                                             step: step_idx,
                                             group: group_idx,
                                             plugin: plugin_idx,
                                             plugin_name: plugin.name.clone(),
                                             source: r.source.clone(),
-                                        });
+                                        },
+                                    );
                                 }
                             }
                         }
@@ -774,10 +764,7 @@ impl std::fmt::Display for ValidationHint {
                 group,
                 max,
                 current,
-            } => write!(
-                f,
-                "{group}: at most {max} allowed, have {current} selected"
-            ),
+            } => write!(f, "{group}: at most {max} allowed, have {current} selected"),
             ValidationHint::NotUsableSelected { group, plugin } => {
                 write!(f, "{group}: \"{plugin}\" is marked as not usable")
             }
@@ -842,31 +829,19 @@ impl std::error::Error for SelectionError {}
 fn compute_defaults(group: &Group, type_fn: impl Fn(&Plugin) -> PluginType) -> Vec<usize> {
     match group.group_type {
         GroupType::SelectAll => (0..group.plugins.plugins.len()).collect(),
-        GroupType::SelectExactlyOne | GroupType::SelectAtMostOne => {
-            group
-                .plugins
-                .plugins
-                .iter()
-                .position(|p| {
-                    matches!(
-                        type_fn(p),
-                        PluginType::Required | PluginType::Recommended
-                    )
-                })
-                .map(|i| vec![i])
-                .unwrap_or_default()
-        }
+        GroupType::SelectExactlyOne | GroupType::SelectAtMostOne => group
+            .plugins
+            .plugins
+            .iter()
+            .position(|p| matches!(type_fn(p), PluginType::Required | PluginType::Recommended))
+            .map(|i| vec![i])
+            .unwrap_or_default(),
         GroupType::SelectAtLeastOne | GroupType::SelectAny => group
             .plugins
             .plugins
             .iter()
             .enumerate()
-            .filter(|(_, p)| {
-                matches!(
-                    type_fn(p),
-                    PluginType::Required | PluginType::Recommended
-                )
-            })
+            .filter(|(_, p)| matches!(type_fn(p), PluginType::Required | PluginType::Recommended))
             .map(|(i, _)| i)
             .collect(),
     }
@@ -899,7 +874,10 @@ fn normalize_dest(source: &str, destination: &str) -> String {
 /// Resolve a relative path case-insensitively against a base directory.
 fn resolve_path_case_insensitive(base: &Path, relative: &str) -> Option<std::path::PathBuf> {
     // Normalize separators
-    let parts: Vec<&str> = relative.split(['/', '\\']).filter(|s| !s.is_empty()).collect();
+    let parts: Vec<&str> = relative
+        .split(['/', '\\'])
+        .filter(|s| !s.is_empty())
+        .collect();
     let mut current = base.to_path_buf();
 
     for part in parts {
@@ -1072,7 +1050,11 @@ mod tests {
     fn defaults_exactly_one_picks_first_required() {
         let g = make_group_typed(
             GroupType::SelectExactlyOne,
-            vec![PluginType::Optional, PluginType::Required, PluginType::Required],
+            vec![
+                PluginType::Optional,
+                PluginType::Required,
+                PluginType::Required,
+            ],
         );
         assert_eq!(Installer::default_selections(&g), vec![1]);
     }
@@ -1099,7 +1081,11 @@ mod tests {
     fn defaults_select_all_returns_all() {
         let g = make_group_typed(
             GroupType::SelectAll,
-            vec![PluginType::Optional, PluginType::Optional, PluginType::Optional],
+            vec![
+                PluginType::Optional,
+                PluginType::Optional,
+                PluginType::Optional,
+            ],
         );
         assert_eq!(Installer::default_selections(&g), vec![0, 1, 2]);
     }
@@ -1143,10 +1129,16 @@ mod tests {
         let mut installer = Installer::new(config);
 
         installer.select(0, 0, vec![0]);
-        assert_eq!(installer.context().flags.get("choice"), Some(&"a".to_string()));
+        assert_eq!(
+            installer.context().flags.get("choice"),
+            Some(&"a".to_string())
+        );
 
         installer.select(0, 0, vec![1]);
-        assert_eq!(installer.context().flags.get("choice"), Some(&"b".to_string()));
+        assert_eq!(
+            installer.context().flags.get("choice"),
+            Some(&"b".to_string())
+        );
     }
 
     // ---- resolve ----
@@ -1172,7 +1164,11 @@ mod tests {
         let config = ModuleConfig::parse(xml).unwrap();
         let installer = Installer::new(config);
         let plan = installer.resolve();
-        let sources: Vec<&str> = plan.operations.iter().map(|op| op.source.as_str()).collect();
+        let sources: Vec<&str> = plan
+            .operations
+            .iter()
+            .map(|op| op.source.as_str())
+            .collect();
         assert_eq!(sources, vec!["low.esp", "mid.esp", "high.esp"]);
     }
 
@@ -1222,7 +1218,11 @@ mod tests {
             "plugin index out of bounds"
         );
         assert_eq!(
-            SelectionError::InvalidCount { expected: "exactly 1", got: 3 }.to_string(),
+            SelectionError::InvalidCount {
+                expected: "exactly 1",
+                got: 3
+            }
+            .to_string(),
             "expected exactly 1 selections, got 3"
         );
     }
@@ -1238,7 +1238,10 @@ mod tests {
         ctx.game_version = Some("1.5".into());
 
         let installer = Installer::with_context(config, ctx);
-        assert_eq!(installer.context().flags.get("pre"), Some(&"val".to_string()));
+        assert_eq!(
+            installer.context().flags.get("pre"),
+            Some(&"val".to_string())
+        );
         assert_eq!(installer.context().game_version, Some("1.5".to_string()));
     }
 }

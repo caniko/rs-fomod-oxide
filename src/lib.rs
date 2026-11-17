@@ -37,8 +37,7 @@ pub mod installer;
 pub use condition::{EvalContext, Evaluate, FileState};
 pub use config::ModuleConfig;
 pub use declarative::{
-    hash_xml, DeclarativeConfig, DeclarativeError, SelectionDiff, SelectionSummary,
-    SCHEMA_VERSION,
+    hash_xml, DeclarativeConfig, DeclarativeError, SelectionDiff, SelectionSummary, SCHEMA_VERSION,
 };
 pub use error::FomodError;
 pub use info::FomodInfo;

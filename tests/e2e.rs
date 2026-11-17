@@ -49,7 +49,10 @@ fn e2e_simple_high_res_flow() {
     assert!(!plan.operations.iter().any(|op| op.source == "textures_2k"));
 
     // Conditional HD patches triggered
-    assert!(plan.operations.iter().any(|op| op.source == "patches/hd_normals.esp"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -71,7 +74,10 @@ fn e2e_simple_standard_res_flow() {
     assert!(!plan.operations.iter().any(|op| op.source == "textures_4k"));
 
     // No conditional HD patches
-    assert!(!plan.operations.iter().any(|op| op.source == "patches/hd_normals.esp"));
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -88,8 +94,14 @@ fn e2e_simple_with_optional_patches() {
     let plan = installer.resolve();
 
     assert!(plan.operations.iter().any(|op| op.source == "textures_4k"));
-    assert!(plan.operations.iter().any(|op| op.source == "patches/lod_opt.esp"));
-    assert!(plan.operations.iter().any(|op| op.source == "patches/hd_normals.esp"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/lod_opt.esp"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -114,7 +126,10 @@ fn e2e_hdtsmp_se_cuda_complete() {
     assert!(plan.operations.iter().any(|op| op.source == "Readme.txt"));
 
     // Correct conditional: SE + CUDA
-    assert!(plan.operations.iter().any(|op| op.source == "SE_CUDA\\SKSE"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "SE_CUDA\\SKSE"));
 
     // No other conditionals
     let skse_ops: Vec<&str> = plan
@@ -162,7 +177,10 @@ fn e2e_hdtsmp_vr_no_conditionals() {
         .filter(|op| op.source.contains("SKSE"))
         .map(|op| op.source.as_str())
         .collect();
-    assert!(skse_ops.is_empty(), "VR should not trigger any SKSE patterns");
+    assert!(
+        skse_ops.is_empty(),
+        "VR should not trigger any SKSE patterns"
+    );
 
     // Thanks step should be hidden
     let visible = installer.visible_steps();
@@ -180,13 +198,22 @@ fn e2e_hdtsmp_switching_platforms() {
     installer.select(1, 1, vec![0]);
 
     let plan1 = installer.resolve();
-    assert!(plan1.operations.iter().any(|op| op.source == "SE_CUDA\\SKSE"));
+    assert!(plan1
+        .operations
+        .iter()
+        .any(|op| op.source == "SE_CUDA\\SKSE"));
 
     // Switch to AE (keep CUDA)
     installer.select(1, 0, vec![1]);
     let plan2 = installer.resolve();
-    assert!(plan2.operations.iter().any(|op| op.source == "AE_CUDA\\SKSE"));
-    assert!(!plan2.operations.iter().any(|op| op.source == "SE_CUDA\\SKSE"));
+    assert!(plan2
+        .operations
+        .iter()
+        .any(|op| op.source == "AE_CUDA\\SKSE"));
+    assert!(!plan2
+        .operations
+        .iter()
+        .any(|op| op.source == "SE_CUDA\\SKSE"));
 }
 
 // =====================================================================
@@ -209,7 +236,10 @@ fn e2e_declarative_roundtrip_simple() {
 
     // Should produce same result as manual high-res selection (default = Recommended)
     assert!(plan.operations.iter().any(|op| op.source == "textures_4k"));
-    assert!(plan.operations.iter().any(|op| op.source == "patches/hd_normals.esp"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -224,10 +254,7 @@ fn e2e_declarative_custom_selection() {
         selections: HashMap::from([
             (
                 "Choose Textures".into(),
-                HashMap::from([(
-                    "Texture Quality".into(),
-                    vec!["Standard Resolution".into()],
-                )]),
+                HashMap::from([("Texture Quality".into(), vec!["Standard Resolution".into()])]),
             ),
             (
                 "Optional Patches".into(),
@@ -247,10 +274,16 @@ fn e2e_declarative_custom_selection() {
     assert!(!plan.operations.iter().any(|op| op.source == "textures_4k"));
 
     // LOD patch selected
-    assert!(plan.operations.iter().any(|op| op.source == "patches/lod_opt.esp"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/lod_opt.esp"));
 
     // No conditional HD patches (texture_quality=standard)
-    assert!(!plan.operations.iter().any(|op| op.source == "patches/hd_normals.esp"));
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 #[test]
@@ -274,7 +307,10 @@ fn e2e_declarative_hdtsmp() {
     decl.apply(HDTSMP_LIKE, &mut installer).unwrap();
     let plan = installer.resolve();
 
-    assert!(plan.operations.iter().any(|op| op.source == "AE_CUDA\\SKSE"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "AE_CUDA\\SKSE"));
     assert!(plan.operations.iter().any(|op| op.source == "Licence.txt"));
 }
 
@@ -466,10 +502,7 @@ fn e2e_declarative_multi_step_with_visibility() {
             ),
             (
                 "Expert Options".into(),
-                HashMap::from([(
-                    "Expert Tweaks".into(),
-                    vec!["Debug Mode".into()],
-                )]),
+                HashMap::from([("Expert Tweaks".into(), vec!["Debug Mode".into()])]),
             ),
         ]),
     };
@@ -505,9 +538,15 @@ fn e2e_declarative_partial_defaults_fill_in() {
     // Default for Choose Textures is High Resolution (Recommended)
     assert!(plan.operations.iter().any(|op| op.source == "textures_4k"));
     // LOD patch selected
-    assert!(plan.operations.iter().any(|op| op.source == "patches/lod_opt.esp"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/lod_opt.esp"));
     // Conditional for high-res should trigger
-    assert!(plan.operations.iter().any(|op| op.source == "patches/hd_normals.esp"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "patches/hd_normals.esp"));
 }
 
 // =====================================================================
@@ -530,9 +569,18 @@ fn e2e_dep_type_windows_complete_flow() {
     assert!(plan.operations.iter().any(|op| op.source == "win_base.dll"));
 
     // Conditional: both desktop and windows patterns match
-    assert!(plan.operations.iter().any(|op| op.source == "desktop_extras.dll"));
-    assert!(plan.operations.iter().any(|op| op.source == "win_extras.dll"));
-    assert!(!plan.operations.iter().any(|op| op.source == "deck_extras.dll"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "desktop_extras.dll"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "win_extras.dll"));
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "deck_extras.dll"));
 }
 
 #[test]
@@ -545,9 +593,15 @@ fn e2e_dep_type_steamdeck_flow() {
     let plan = installer.resolve();
 
     assert!(plan.operations.iter().any(|op| op.source == "deck_base.so"));
-    assert!(plan.operations.iter().any(|op| op.source == "deck_extras.dll"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "deck_extras.dll"));
     // Desktop extras should NOT be present (os_family=handheld, not desktop)
-    assert!(!plan.operations.iter().any(|op| op.source == "desktop_extras.dll"));
+    assert!(!plan
+        .operations
+        .iter()
+        .any(|op| op.source == "desktop_extras.dll"));
 }
 
 #[test]
@@ -558,14 +612,23 @@ fn e2e_dep_type_switching_platforms() {
     // Start with Windows
     installer.select(0, 0, vec![0]);
     let plan1 = installer.resolve();
-    assert!(plan1.operations.iter().any(|op| op.source == "win_extras.dll"));
+    assert!(plan1
+        .operations
+        .iter()
+        .any(|op| op.source == "win_extras.dll"));
 
     // Switch to Linux
     installer.select(0, 0, vec![1]);
     let plan2 = installer.resolve();
     // Linux is desktop but not windows
-    assert!(plan2.operations.iter().any(|op| op.source == "desktop_extras.dll"));
-    assert!(!plan2.operations.iter().any(|op| op.source == "win_extras.dll"));
+    assert!(plan2
+        .operations
+        .iter()
+        .any(|op| op.source == "desktop_extras.dll"));
+    assert!(!plan2
+        .operations
+        .iter()
+        .any(|op| op.source == "win_extras.dll"));
 }
 
 // =====================================================================
@@ -587,14 +650,12 @@ fn e2e_install_plan_execute_nested_folders() {
     fs::write(source_dir.join("data/textures/skin.dds"), "tex").unwrap();
 
     let plan = fomod_oxide::InstallPlan {
-        operations: vec![
-            fomod_oxide::FileOperation {
-                source: "data".into(),
-                destination: "GameData".into(),
-                is_folder: true,
-                priority: 0,
-            },
-        ],
+        operations: vec![fomod_oxide::FileOperation {
+            source: "data".into(),
+            destination: "GameData".into(),
+            is_folder: true,
+            priority: 0,
+        }],
     };
 
     plan.execute(&source_dir, &dest_dir).unwrap();
@@ -888,10 +949,7 @@ fn e2e_flag_impact_map() {
     assert!(!impacts.is_empty());
 
     // Check that plugins from step 0 are flagged as impacting other steps
-    let mode_impacts: Vec<&FlagImpact> = impacts
-        .iter()
-        .filter(|i| i.flag_name == "mode")
-        .collect();
+    let mode_impacts: Vec<&FlagImpact> = impacts.iter().filter(|i| i.flag_name == "mode").collect();
     assert!(!mode_impacts.is_empty());
 
     // All mode flag setters should come from step 0
@@ -901,8 +959,14 @@ fn e2e_flag_impact_map() {
 
     // Mode should affect steps 1 (Advanced Options), 2 (Expert Options), and 3 (Summary)
     let affected_steps: Vec<usize> = mode_impacts.iter().map(|i| i.affected_step).collect();
-    assert!(affected_steps.contains(&1), "mode should affect Advanced Options");
-    assert!(affected_steps.contains(&2), "mode should affect Expert Options");
+    assert!(
+        affected_steps.contains(&1),
+        "mode should affect Advanced Options"
+    );
+    assert!(
+        affected_steps.contains(&2),
+        "mode should affect Expert Options"
+    );
     assert!(affected_steps.contains(&3), "mode should affect Summary");
 
     // Also check "show_expert" flag impact on Expert Options step
@@ -911,7 +975,9 @@ fn e2e_flag_impact_map() {
         .filter(|i| i.flag_name == "show_expert")
         .collect();
     assert!(!show_expert_impacts.is_empty());
-    assert!(show_expert_impacts.iter().any(|i| i.affected_step_name == "Expert Options"));
+    assert!(show_expert_impacts
+        .iter()
+        .any(|i| i.affected_step_name == "Expert Options"));
 }
 
 // =====================================================================
@@ -948,12 +1014,24 @@ fn e2e_preview_vs_resolve_conditional_files() {
     );
 
     // Both should include required files
-    assert!(preview.operations.iter().any(|op| op.source == "readme.txt"));
-    assert!(resolved.operations.iter().any(|op| op.source == "readme.txt"));
+    assert!(preview
+        .operations
+        .iter()
+        .any(|op| op.source == "readme.txt"));
+    assert!(resolved
+        .operations
+        .iter()
+        .any(|op| op.source == "readme.txt"));
 
     // Both should include selected plugin files
-    assert!(preview.operations.iter().any(|op| op.source == "textures_4k"));
-    assert!(resolved.operations.iter().any(|op| op.source == "textures_4k"));
+    assert!(preview
+        .operations
+        .iter()
+        .any(|op| op.source == "textures_4k"));
+    assert!(resolved
+        .operations
+        .iter()
+        .any(|op| op.source == "textures_4k"));
 }
 
 // =====================================================================
@@ -1036,8 +1114,14 @@ fn e2e_missing_selections_tracking() {
     // Introduction (SelectAll) needs all plugins selected -> (0,0) is missing
     // Options: Platform (SelectExactlyOne) -> (1,0) is missing
     // Options: CUDA (SelectExactlyOne) -> (1,1) is missing
-    assert!(missing0.contains(&(0, 0)), "Introduction group should be missing");
-    assert!(missing0.contains(&(1, 0)), "Platform group should be missing");
+    assert!(
+        missing0.contains(&(0, 0)),
+        "Introduction group should be missing"
+    );
+    assert!(
+        missing0.contains(&(1, 0)),
+        "Platform group should be missing"
+    );
     assert!(missing0.contains(&(1, 1)), "CUDA group should be missing");
 
     // Select Platform (SE) -> SSE=On, which also makes Thanks visible (adding (2,0))
@@ -1099,10 +1183,7 @@ fn e2e_declarative_summary_and_diff() {
         selections: HashMap::from([
             (
                 "Choose Textures".into(),
-                HashMap::from([(
-                    "Texture Quality".into(),
-                    vec!["High Resolution".into()],
-                )]),
+                HashMap::from([("Texture Quality".into(), vec!["High Resolution".into()])]),
             ),
             (
                 "Optional Patches".into(),
@@ -1121,10 +1202,7 @@ fn e2e_declarative_summary_and_diff() {
         hash: hash_xml(SIMPLE_CONFIG),
         selections: HashMap::from([(
             "Choose Textures".into(),
-            HashMap::from([(
-                "Texture Quality".into(),
-                vec!["Standard Resolution".into()],
-            )]),
+            HashMap::from([("Texture Quality".into(), vec!["Standard Resolution".into()])]),
         )]),
     };
 
@@ -1144,7 +1222,10 @@ fn e2e_declarative_summary_and_diff() {
 
     // Test diff
     let diffs = decl_high.diff(&decl_standard);
-    assert!(!diffs.is_empty(), "There should be differences between configs");
+    assert!(
+        !diffs.is_empty(),
+        "There should be differences between configs"
+    );
 
     // Texture quality should differ
     let texture_diff = diffs
@@ -1178,7 +1259,10 @@ fn e2e_hdtsmp_wizard_with_undo() {
 
     // Verify SE+CUDA conditional
     let plan = installer.resolve();
-    assert!(plan.operations.iter().any(|op| op.source == "SE_CUDA\\SKSE"));
+    assert!(plan
+        .operations
+        .iter()
+        .any(|op| op.source == "SE_CUDA\\SKSE"));
 
     // Checkpoint the SE+CUDA state
     installer.checkpoint();
@@ -1186,8 +1270,14 @@ fn e2e_hdtsmp_wizard_with_undo() {
     // Switch to AE (keep CUDA)
     installer.select(1, 0, vec![1]); // AE
     let plan_ae = installer.resolve();
-    assert!(plan_ae.operations.iter().any(|op| op.source == "AE_CUDA\\SKSE"));
-    assert!(!plan_ae.operations.iter().any(|op| op.source == "SE_CUDA\\SKSE"));
+    assert!(plan_ae
+        .operations
+        .iter()
+        .any(|op| op.source == "AE_CUDA\\SKSE"));
+    assert!(!plan_ae
+        .operations
+        .iter()
+        .any(|op| op.source == "SE_CUDA\\SKSE"));
 
     // Rollback -> should restore SE+CUDA
     assert!(installer.rollback());
@@ -1210,8 +1300,14 @@ fn e2e_hdtsmp_wizard_with_undo() {
     );
 
     // Verify flags are restored (SSE=On, AE=Off)
-    assert_eq!(installer.context().flags.get("SSE"), Some(&"On".to_string()));
-    assert_eq!(installer.context().flags.get("AE"), Some(&"Off".to_string()));
+    assert_eq!(
+        installer.context().flags.get("SSE"),
+        Some(&"On".to_string())
+    );
+    assert_eq!(
+        installer.context().flags.get("AE"),
+        Some(&"Off".to_string())
+    );
 }
 
 // =====================================================================
@@ -1268,10 +1364,7 @@ fn e2e_metadata_accessors() {
         installer.group_type_at(0, 0),
         Some(GroupType::SelectExactlyOne)
     );
-    assert_eq!(
-        installer.group_type_at(1, 0),
-        Some(GroupType::SelectAny)
-    );
+    assert_eq!(installer.group_type_at(1, 0), Some(GroupType::SelectAny));
     assert_eq!(installer.group_type_at(99, 0), None);
 
     // Select high-res and verify plugin_type_at still works in context
